@@ -12,7 +12,8 @@ library.add(faAngellist, faCheck, faGraduationCap, faCannabis, faChessQueen, faC
 React === React;
 // Init Socket,io
 declare const io: any;
+declare const ENV_PORT: any;
 
 // Get Socket.io
-let socket = io.connect('http://192.168.0.101:8087/pizi-moins-de-neuf');
+let socket = io.connect('http://0.0.0.0:'+ ENV_PORT + '/pizi-moins-de-neuf');
 ReactDOM.render(<Lobby socket={socket} username={null}/>, document.getElementsByTagName("app")[0]);
