@@ -1,0 +1,185 @@
+.gameboard{
+    width: 100%;
+    height: 100%;
+    position: relative;
+    overflow: hidden;
+    background-color: #222;
+
+    &.game-running{
+        .icon .fa-check{
+            display: none;
+        }
+    }
+
+    &.my-turn{
+        background-color: #301C14;
+    }
+
+    .playerHand{
+        height: 180px;
+        overflow: hidden;
+    }
+
+    .fold{
+        height: 250px;
+        overflow: hidden;
+        position: relative;
+
+        .hand{
+            position: absolute;
+            bottom: 0;
+            left: 0;
+
+            &.previous-play.is-picking{
+                opacity: 0.7;
+                .card.selected{
+                    background-color: @color-main;
+                }
+            }
+
+            &.played{
+                bottom: -40px;
+                pointer-events: none;
+            }
+        }
+    }
+
+    .top{
+        height: calc(100% - 470px);
+        overflow: hidden;
+        padding: 8px;
+    }
+
+    .top-board{
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+    }
+
+    .pick.selected{
+        background-color: @color-main;
+    }
+
+    .players{
+        width: calc(100% ~"-" 122px);
+        max-width: 350px;
+        height: 200px;
+        border: 1px solid #444;
+        border-radius: 8px;
+        margin: 0 4px;
+    }
+
+    .actions{
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 40px;
+        border-top: 1px solid;
+        border-bottom: 1px solid;
+        border-color: #444;
+        font-size: 20px;
+        letter-spacing: 2px;
+        color: #999;
+        text-transform: uppercase;
+
+        &.disabled{
+            pointer-events: none;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            overflow: hidden;
+        }
+
+        button{
+            border-radius: 0;
+            color: peru;
+            font-size: 26px;
+            text-align: center;
+            text-transform: uppercase;
+            background-color: transparent;
+            border: none;
+            border-top: 1px solid @color-main;
+            border-bottom: 1px solid @color-main;
+            margin: 0;
+            padding: 2px;
+            letter-spacing: 0.8;
+            flex: 1 0;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            overflow: hidden;
+            cursor: pointer;
+            height: 100%;
+            letter-spacing: 2.5px;
+
+            svg{
+                margin-left: 6px;
+            }
+
+            &:hover{
+                background-color: #444;
+            }
+
+            &:focus{
+                outline: none;
+            }
+
+            &.less-than-nine{
+                font-size: 14px;
+                letter-spacing: 2px;
+
+                svg{
+                    margin-left: 6px;
+                    font-size: 20px;
+                }
+            }
+
+            & + button{
+                border-left: 1px solid @color-main;
+            }
+        }
+    }
+
+    .results{
+        position: absolute;
+        top: 8px;
+        bottom: 8px;
+        left: 8px;
+        right: 8px;
+        background-color: #B25E18;
+        border-radius: 16px;
+        padding: 8px;
+        overflow-y: auto;
+
+        .fa-times{
+            position: absolute;
+            top: 8px;
+            right: 8px;
+        }
+
+        .winners{
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            .fa-trophy{
+                margin-right: 16px;
+            }
+        }
+
+        .playerHand{
+            font-size: 20px;
+
+            .hand {
+                margin-top: 8px;
+
+                .card {
+                    bottom: initial;
+                    top: 0;
+                }
+            }
+        }
+
+        .playerHand + .playerHand{
+            margin-top: 16px;
+        }
+    }
+}

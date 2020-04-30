@@ -1,0 +1,226 @@
+@heart: "♥";
+@heart-light: "♡";
+@spade: "♠";
+@spade-light: "♤";
+@diamond: "♦";
+@diamond-light: "♢";
+@club: "♣";
+@club-light: "♧";
+
+.card{
+    border-radius: 16px;
+    border: 1px solid rgba(0,0,0,0.2);
+    height: 200px;
+    width: 120px;
+    display: inline-block;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    background-color: #BBB;
+    box-shadow: -1px 1px 1px rgba(0,0,0,0.2);
+
+    &.notTurned{
+        background-color: #444; 
+        border-color: @color-main;
+
+        svg{
+            font-size: 80px;
+            color: #555; 
+        }
+    }
+
+    .value{
+        position: absolute;
+        padding: 8px;
+        display: flex;
+
+        .joker{
+            font-size: 26px;
+        }
+
+        &:nth-child(1){
+            top: 0;
+            left: 0;
+            i{
+                order: 1;
+            }
+            span{
+                order: 2;
+            }
+            .joker{
+                color: #222;
+            }
+        }
+        &:nth-child(2){
+            top: 0;
+            right: 0;
+
+            .joker{
+                color: #e02f1f;
+            }
+        }
+        &:nth-child(3){
+            bottom: 0;
+            left: 0;
+            transform: rotateZ(180deg);
+
+            .joker{
+                color: #e02f1f;
+            }
+        }
+        &:nth-child(4){
+            bottom: 0;
+            right: 0;
+            transform: rotateZ(180deg);
+            i{
+                order: 1;
+            }
+            span{
+                order: 2;
+            }
+
+            .joker{
+                color: #222;
+            }
+        }
+
+        span{
+            padding: 0 4px; 
+        }
+    }
+
+    .symbol{
+        display: flex;
+        font-size: 1.8em;
+        padding: 0.2em;
+        justify-content: center;
+        align-items: center;
+        height: 70%;
+        width: 70%;
+        position: relative;
+
+        svg{
+            font-size: 60px;
+            opacity: 0.8;
+
+            &.joker{
+                color: #265F1C;
+            }
+        }
+
+        &.value-2, &.value-3{
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        &.value-4, &.value-5, &.value-6, &.value-7, &.value-8, &.value-9, &.value-10{
+            i{
+                position: absolute;
+            }
+            i:nth-child(1){
+                top: 0;
+                left: 0;
+            }
+            i:nth-child(2){
+                top: 0;
+                right: 0;
+            }
+            i:nth-child(3){
+                bottom: 0;
+                left: 0;
+            }
+            i:nth-child(4){
+                bottom: 0;
+                right: 0;
+            }
+        }
+
+        &.value-6, &.value-7, &.value-8{
+            i:nth-child(5){
+                left: 0;
+            }
+            i:nth-child(6){
+                right: 0;
+            }  
+        }
+
+        &.value-7, &.value-8{
+            i:nth-child(7){
+                top: 20%;
+            } 
+        }
+
+        &.value-8{
+            i:nth-child(8){
+                bottom: 20%;
+            } 
+        }
+
+        &.value-9, &.value-10{
+            i:nth-child(5){
+                top: 25%;
+                left: 0;
+            }
+            i:nth-child(6){
+                top: 25%;
+                right: 0;
+            }  
+            i:nth-child(7){
+                bottom: 25%;
+                left: 0;
+            } 
+            i:nth-child(8){
+                bottom: 25%;
+                right: 0;
+            } 
+        }
+
+        &.value-10{
+            i:nth-child(9){
+                top: 20%;
+            }
+            i:nth-child(10){
+                bottom: 20%;
+            }
+        }
+
+    }
+
+    i{
+        font-style: normal;
+    }
+
+    i.heart:before{
+        content: @heart;
+    }
+    i.heart-light:before{
+        content: @heart-light;
+    }
+    i.spade:before{
+        content: @spade;
+    }
+    i.spade-light:before{
+        content: @spade-light;
+    }
+    i.diamond:before{
+        content: @diamond;
+    }
+    i.diamond-light:before{
+        content: @diamond-light;
+    }
+    i.club:before{
+        content: @club;
+    }
+    i.club-light:before{
+        content: @club-light;
+    }
+
+    .heart, .diamond{
+        color: #e02f1f;
+    }
+
+    .spade, .club{
+        color: #222;
+    }
+}

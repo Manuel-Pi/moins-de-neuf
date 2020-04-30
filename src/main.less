@@ -1,0 +1,128 @@
+@charset "UTF-8";
+/* Normalize */
+@import "../node_modules/normalize.css/normalize.css";
+
+@color-black: #222;
+@color-black-light: #444;
+@color-main: peru;
+@color-main-light: #e7944b;
+@color-main-medium-dark: #B25E18;
+@color-main-dark: #301C14;
+@color-white: #DDDD;
+@color-hover: @color-black-light;
+
+@border: 4px solid @color-black;
+@border-light: 1px solid @color-black-light;
+@border-radius: 14px;
+
+@font-family: Arial, Helvetica, sans-serif;
+
+@letter-spacing: 1.8px;
+
+html, body, app{
+    height: 100vh;
+    width: 100vw;
+}
+
+body{
+    background-color: @color-black;
+    color: @color-white;
+    font-family: @font-family;
+    letter-spacing: @letter-spacing;
+}
+
+*{
+    box-sizing: border-box;
+}
+
+table, input{
+    outline: none;
+    min-width: 200px;
+}
+
+input{
+    height: 50px;
+    font-size: 30px;
+    line-height: 30px;
+    text-indent: 10px;
+    color: @color-black;
+    background-color: #DDD;
+    border: @border;
+    border-radius: @border-radius;
+}
+
+button{
+    background-color: transparent;  
+    border: @border;
+    border-radius: @border-radius;
+    font-size: 24px;
+    padding: 8px 16px;
+    cursor: pointer;
+    color: @color-black;
+    letter-spacing: @letter-spacing;
+
+    &:hover{
+        background-color: @color-main-light;
+    }
+}
+
+table{
+    width: 100%;
+    border-collapse: collapse;
+
+    thead{
+        border-bottom: @border;
+        color: @color-black;
+    }
+
+    th, td{
+        text-align: left;
+        font-size: 24px;
+        font-weight: 100;
+        letter-spacing: 1.8px;
+        padding: 8px 16px;
+        color: @color-black;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    tr:hover{
+        cursor: pointer;
+        td{
+            background-color: @color-main-light;
+            color: @color-hover;
+        }
+    }
+
+    tr + tr {
+        border-top: @border-light;
+    }
+}
+
+.hidden{
+    display: none;
+}
+
+app{
+    height: 1vh;
+    width: 1vw;
+}
+
+.fa-spinner{
+    animation:spin 1.5s linear infinite;
+}
+
+@keyframes spin {  
+    100% { 
+        transform:rotate(360deg); 
+    } 
+}
+
+@import "./components/GameBoard/gameBoard";
+@import "./components/Card/card";
+@import "./components/Hand/hand";
+@import "./components/Player/player";
+@import "./components/Logo/logo";
+@import "./components/Menu/menu";
+@import "./components/Lobby/lobby";
