@@ -23,14 +23,16 @@ export const Table = ({ className, header, body = [], actions = [], onSelect, se
     };
 
     return  <div className={tableClassName}>
-                <table>
-                    <thead>
-                    { header.map(el => <th>{el}</th>) }
-                    </thead>
-                    <tbody>
-                    { body.map((row, i) => <tr className={ selectedRow === i ? "selected" : ""} onClick={e => clickHandler(i)}>{row.map((cell:any) => <td>{cell}</td>)}</tr>) }
-                    </tbody>
-                </table>
+                <div className="table-container">
+                    <table>
+                        <thead>
+                        { header.map(el => <th>{el}</th>) }
+                        </thead>
+                        <tbody>
+                        { body.map((row, i) => <tr className={ selectedRow === i ? "selected" : ""} onClick={e => clickHandler(i)}>{row.map((cell:any) => <td>{cell}</td>)}</tr>) }
+                        </tbody>
+                    </table>
+                </div>
                 <div className="actions">
                 { actions }
                 </div>

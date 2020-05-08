@@ -1,6 +1,7 @@
 @charset "UTF-8";
 /* Normalize */
 @import "../node_modules/normalize.css/normalize.css";
+@import "../node_modules/animate.css/animate.css";
 
 @color-black: #222;
 @color-black-light: #444;
@@ -19,13 +20,18 @@
 
 @letter-spacing: 1.8px;
 
+@breakpoint-xs: 500px;
+
+@app-max-width: 800px;
+
 html, body, app{
     height: 100vh;
+    min-height: 650px;
     width: 100vw;
 }
 
 body{
-    background-color: @color-black;
+    background-color: #111;
     color: @color-white;
     font-family: @font-family;
     letter-spacing: @letter-spacing;
@@ -38,6 +44,19 @@ body{
 table, input{
     outline: none;
     min-width: 200px;
+    table-layout: fixed;
+    overflow-wrap: break-word;
+
+    tbody{
+        display:block;
+        overflow:auto;
+        height:300px;
+        width:100%;
+    }
+
+    thead tr{
+        display:block;
+    }
 }
 
 input{
@@ -49,20 +68,31 @@ input{
     background-color: #DDD;
     border: @border;
     border-radius: @border-radius;
+
+    @media (max-width: @breakpoint-xs){
+        height: 40px;
+        font-size: 25px;
+        line-height: 25px;
+    }
 }
 
 button{
     background-color: transparent;  
-    border: @border;
+    border: 2px solid #222;
     border-radius: @border-radius;
-    font-size: 24px;
-    padding: 8px 16px;
+    font-size: 20px;
+    padding: 6px 16px;
     cursor: pointer;
     color: @color-black;
     letter-spacing: @letter-spacing;
 
     &:hover{
         background-color: @color-main-light;
+    }
+
+    @media (max-width: @breakpoint-xs){
+        font-size: 16px;
+        padding: 6px 12px;
     }
 }
 
@@ -105,8 +135,10 @@ table{
 }
 
 app{
-    height: 1vh;
-    width: 1vw;
+    max-width: @app-max-width;
+    display: block;
+    margin: 0 auto;
+    background-color: @color-black;
 }
 
 .fa-spinner{

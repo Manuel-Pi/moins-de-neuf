@@ -7,6 +7,7 @@
     justify-content: center;
     align-items: center;
     padding-top: 40px;
+    position: relative;
 
     .login{
         display: flex;
@@ -40,7 +41,42 @@
     .games{
         max-width: 500px;
         width: 100%;
-        min-height: 400px;
+
+        .table-container{
+            max-width: 100%;
+            overflow: auto;
+
+            tbody{
+                width: 500px;
+            }
+
+
+            th{
+                &:nth-child(1){
+                    width: 237px;
+                }
+                &:nth-child(2){
+                    width: 135px;
+                }
+                &:nth-child(3){
+                    width: 122px;
+                }
+            }
+
+            td{
+                font-size: 20px;
+                &:nth-child(1){
+                    width: 330px;
+                }
+                &:nth-child(2){
+                    width: 50px;
+                }
+                &:nth-child(3){
+                    width: 120px;
+                    font-size: 16px;
+                }
+            }
+        }
     
         .name{
             width: 100%;
@@ -76,8 +112,41 @@
                 opacity: 0.3;
             }
 
-            button.join{
+            button.join, button.quit{
                 float: right;
+            }
+        }
+    }
+
+    .disconnect{
+        position: absolute;
+        bottom: 16px;
+        margin: 0 auto;
+    }
+
+    @media (max-width: @breakpoint-xs){
+        .login .logo{
+            font-size: 3em;
+        }
+
+
+        table td, table th{
+            font-size: 16px;
+        }
+
+        .table{
+            .actions{
+                padding: 16px;
+
+                button{
+                    font-size: 16px;
+                }
+            }
+        }
+
+        .actions{
+            button{
+                font-size: 16px;
             }
         }
     }

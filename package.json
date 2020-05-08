@@ -6,11 +6,12 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "webpack --env.production",
-    "deploy": "npm run build && mkdir -p ../PiziServer/moins-de-neuf && rm -R ../PiziServer/moins-de-neuf/* && cp -R ./dist/* ../PiziServer/moins-de-neuf"
+    "deploy": "npm run build && mkdir -p ../pizi-express-server/apps/moins-de-neuf && rm -f -r ../pizi-express-server/apps/moins-de-neuf/* && cp -R ./dist/* ../pizi-express-server/apps/moins-de-neuf"
   },
   "author": "Manuel-Pi",
   "license": "ISC",
   "devDependencies": {
+    "@fortawesome/free-brands-svg-icons": "^5.13.0",
     "@types/react": "^16.9.34",
     "@types/react-dom": "^16.9.6",
     "css-loader": "^3.5.2",
@@ -31,8 +32,10 @@
     "@fortawesome/free-solid-svg-icons": "^5.13.0",
     "@fortawesome/react-fontawesome": "^0.1.9",
     "@types/socket.io": "^2.1.4",
+    "animate.css": "^4.0.0",
     "normalize.css": "^8.0.1",
     "react": "^16.13.1",
-    "react-dom": "^16.13.1"
+    "react-dom": "^16.13.1",
+    "react-sortablejs": "^2.0.11"
   }
 }

@@ -5,9 +5,10 @@ import { Card } from '../Card/Card';
 import { PlayerModel } from '../Player/PlayerModel';
 import { Players } from '../Player/Players';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { GameModel } from './GameModel';
+import { GameModel, CheckPlayedCards } from './GameModel';
 import { CreateClassName } from '../Utils/Utils';
 import { Score } from '../Player/Score';
+import { GameBoardModel } from './GameBoardModel';
 
 type GameState = {
     menuActive: boolean,
@@ -23,7 +24,10 @@ type GameState = {
     action: string
     lessThanNine: boolean
     actionMessage: string
-    results: {scores:any, winners:{score: number, names: string[]}}
+    results: {scores:any, winners:{score: number, names: string[]}, players: any[]}
+    quickPlay: boolean,
+    quickPlayed: string,
+    quickPlayedOut: boolean,
 }
 
 type GameProps = {
@@ -39,6 +43,8 @@ export class GameBoard extends Component<GameProps, GameState> {
         username: "",
         className: ""
     }
+
+    private resultPlayerGame:any = null;
 
     private pickCard: CardModel = new CardModel({value: "0", color: "heart"});
 
@@ -58,7 +64,10 @@ export class GameBoard extends Component<GameProps, GameState> {
             action: null,
             lessThanNine: false,
             actionMessage: "",
-            results: null
+            results: null,
+            quickPlay: false,
+            quickPlayed: null,
+            quickPlayedOut: false
         }
     }
 
@@ -75,10 +84,7 @@ export class GameBoard extends Component<GameProps, GameState> {
                 lessThanNine: hand.reduce((sum, card) => sum + card.getIntValue(), 0) < 10
             });
         });
-        this.props.socket.on("gameInfo", (gameInfo:{name: string, players: any[], playedCards: any[], currentPlayer: string, action: string}) => {
-            
-            if(this.state.currentGame && this.state.currentGame !== gameInfo.name) return;
-            
+        this.props.socket.on("gameInfo", (gameInfo:{name: string, players: any[], playedCards: any[], currentPlayer: string, action: string, quickPlay: boolean}) => {
             this.setState({
                 menuActive: false,
                 currentGame: gameInfo.name,
@@ -86,14 +92,45 @@ export class GameBoard extends Component<GameProps, GameState> {
                 players: gameInfo.players.map(player => new PlayerModel(player)),
                 currentPlayer: gameInfo.currentPlayer,
                 action: gameInfo.action,
-                isMyTurn: gameInfo.currentPlayer === this.props.username
+                isMyTurn: gameInfo.currentPlayer === this.props.username,
+                pickSelection: null,
+                quickPlay: gameInfo.quickPlay
             });
+        });
+        this.props.socket.on("selectedPick", (card: any) => {
+            let cardIndex:number = null;
+            let cardModel = null;
+            if(card && card.value === this.pickCard.getValue() && card.color === this.pickCard.getColor()){
+                cardModel = this.pickCard;
+            } else if(card){
+                card && this.state.playedCards[0].forEach((c, index) => {
+                    if(c.getValue() === card.value && c.getColor() === card.color){
+                        cardIndex = index;
+                        return;
+                    }
+                });
+                cardModel = this.state.playedCards[0][cardIndex];
+            }
+            this.selectPickCard(cardModel, true);
         });
         this.props.socket.on("notAllowed", () => {
             alert("Pas possible de jouer ça!");
         });
-        this.props.socket.on("gameEnd", (results: {scores:any, winners:{score:any, names: []}}) => {
-            this.setState({results});
+        this.props.socket.on("quickPlayed", (playerName: string) => {
+            this.setState({quickPlayed: playerName});
+            setTimeout(e => {
+                this.setState({quickPlayedOut: true});
+                setTimeout(e => {this.setState({quickPlayed: null, quickPlayedOut: false});}, 800);
+            }, 1600);
+        });
+        this.props.socket.on("gameEnd", (results: {scores:any, winners:{score:any, names: []}, players:any[]}) => {
+            this.setState({
+                results,
+                hand: [],
+                currentSelection: [],
+                playedCards: [],
+                currentPlayer: null
+            });
         });
     }
 
@@ -119,16 +156,19 @@ export class GameBoard extends Component<GameProps, GameState> {
         this.setState({currentSelection});
     }
 
-    selectPickCard(cardModel: CardModel){
-        if(this.state.action !== "pick" || !this.state.isMyTurn) return;
+    selectPickCard(cardModel: CardModel, force:boolean = false){
+        if(!force && (this.state.action !== "pick" || !this.state.isMyTurn)) return;
 
-        let isValid = false;
+        let isValid = (cardModel && cardModel.getValue() === "0");
         // Only accept first and last card
-        if(!!cardModel && this.state.playedCards[0]){
+        if(!isValid && !!cardModel && this.state.playedCards[0]){
             const index = this.state.playedCards[0].indexOf(cardModel);
             isValid = index !== -1 && ( index === 0 || index === this.state.playedCards[0].length - 1);
         }
-        this.setState({pickSelection: (isValid && this.state.pickSelection !== cardModel) ? cardModel: null });
+        const pickSelection = (isValid && this.state.pickSelection !== cardModel) ? cardModel: null;
+        this.setState({pickSelection});
+        const cardSelection = pickSelection ? CardParser.toJson([pickSelection]) : null;
+        !force && this.props.socket.emit("selectPick", cardSelection);
     }
 
     lessThanNine(){
@@ -136,17 +176,21 @@ export class GameBoard extends Component<GameProps, GameState> {
     }
 
     getAction(){
-
         if(!this.state.action){
             return <button onClick={() => this.props.socket.emit("isReady")}>Prêt<FontAwesomeIcon icon="check"/></button>
         }
+
+        let currentPlayer = this.state.players.filter(player => player.getName() === this.state.currentPlayer)[0];
+        let previousIndex = this.state.players.indexOf(currentPlayer) - 1;
+        previousIndex = previousIndex < 0 ? this.state.players.length - 1 : previousIndex;
+        const isLastPlayer = this.state.players[previousIndex].getName() === this.props.username;
             
-        if(this.state.isMyTurn){
+        if(this.state.isMyTurn || (this.state.quickPlay && isLastPlayer)){
             const buttons = [];
             if((this.state.pickSelection && this.state.action === "pick") || (this.state.currentSelection.length && this.state.action === "play")){
                 buttons.push(<button onClick={() => this.action()}>jouer<FontAwesomeIcon icon="check"/></button>);
             }
-            if(this.state.lessThanNine && this.state.action === "play"){
+            if(this.state.isMyTurn && this.state.lessThanNine && this.state.action === "play"){
                 buttons.push(<button className="less-than-nine" onClick={() => this.lessThanNine()}>moins de neuf<FontAwesomeIcon icon={['fab', 'angellist']}/></button>);
             }
             if(buttons.length) return buttons;
@@ -161,18 +205,27 @@ export class GameBoard extends Component<GameProps, GameState> {
         const winners = this.state.results.winners.names as string[];
         const scores = this.state.results.scores;
         return  <div className="results">
-                    <FontAwesomeIcon icon="trophy" onClick={e => this.setState({results: null})}/>
+                    <FontAwesomeIcon icon="times" size="2x" onClick={e => this.setState({results: null})}/>
                     <h1 className="winners">
                         <FontAwesomeIcon icon="trophy" size="2x"/>
                         {winners.join(", ")} 
                     </h1>
-                    {this.state.players.map(player => 
-                        <div className={"playerHand " + (winners.includes(player.getName()) ? 'winner' : '')}>
-                            <span className="name">{player.getName()}</span>>
-                            <Score score={scores[player.getName()].score} scoreStreak={scores[player.getName()].scoreStreak}/>
-                            <Hand cardModels={player.getHand()} turned/>
+                    {Object.keys(this.state.results.scores).map(name =>
+                        <div className={"playerHand " + (winners.includes(name) ? 'winner' : '')}>
+                            <div>
+                                <span className="name">{name}</span>
+                                <Score score={scores[name].score} scoreStreak={scores[name].scoreStreak}/>
+                            </div>
+                            <Hand cardModels={scores[name].hand.map((card: any) => new CardModel(card))} turned/>
                         </div>
                     )}
+                </div>
+    }
+
+    displayQuickPlayed(){
+        return  <div className={"quick-played " + (this.state.quickPlayedOut ? "out" : "")}>
+                    <div>{this.state.quickPlayed + " a joué rapidement!"}</div>
+                    <FontAwesomeIcon icon="kiss-wink-heart" size="2x" className="" onClick={e => this.setState({results: null})}/>
                 </div>
     }
     
@@ -183,17 +236,26 @@ export class GameBoard extends Component<GameProps, GameState> {
             "game-running": !!this.state.action
         }, this.props.className);
 
+        const needToAct = this.state.isMyTurn && ((this.state.action === "play" && !this.state.currentSelection.length) || (this.state.action === "pick" && !this.state.pickSelection))
+
+        const actionClassName = CreateClassName({
+            "actions": true,
+            "disabled": this.state.currentPlayer && (this.props.username !== this.state.currentPlayer) && !this.state.quickPlay,
+            "need-to-act": needToAct,
+            "need-to-validate": needToAct && (this.state.currentSelection.length || this.state.pickSelection)
+        });
+
         return  <div className={className}>
                     <div className="top">
                         <div className="top-board">
                             <Card   cardModel={this.pickCard} 
                                     className={"pick " + (this.state.pickSelection === this.pickCard ? "selected" : "")}
-                                    onClick={() => this.state.action === "pick" && this.state.isMyTurn && this.setState({pickSelection: this.state.pickSelection === this.pickCard ? null : this.pickCard})}/>
+                                    onClick={() => this.state.action === "pick" && this.state.isMyTurn && this.selectPickCard(this.pickCard)}/>
                             <Players playerModels={this.state.players} currentPlayer={this.state.currentPlayer}/>
                         </div>
-                    </div>
-                    <div className={"actions " + ((this.state.currentPlayer && this.props.username !== this.state.currentPlayer) ? "disabled" : "")}>
-                        {this.getAction()}
+                        <div className={actionClassName}>
+                            {this.getAction()}
+                        </div>
                     </div>
                     <div className="fold">
                         <Hand   className={"previous-play " + (this.state.action === "pick" ? "is-picking" : "")}
@@ -209,6 +271,7 @@ export class GameBoard extends Component<GameProps, GameState> {
                         <Hand cardModels={this.state.hand} selectedCardModels={this.state.currentSelection} onSelected={ cardModel => this.selectCard(cardModel)}/>
                     </div>
                     {this.state.results && this.displayResults()}
+                    {this.state.quickPlayed && this.displayQuickPlayed()}
                 </div>
     }
 }

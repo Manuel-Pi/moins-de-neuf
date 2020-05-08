@@ -12,23 +12,35 @@
     }
 
     &.my-turn{
-        background-color: #301C14;
+        //background-color: #301C14;
     }
 
     .playerHand{
-        height: 180px;
+        height: 35%;
         overflow: hidden;
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+
+        .hand{
+            bottom: 0;
+        }
     }
 
     .fold{
-        height: 250px;
+        height: 35%;
         overflow: hidden;
         position: relative;
+        padding-bottom: 8px;
 
         .hand{
             position: absolute;
-            bottom: 0;
+            top: 0;
             left: 0;
+
+            &.previous-play{
+           
+            }
 
             &.previous-play.is-picking{
                 opacity: 0.7;
@@ -38,22 +50,24 @@
             }
 
             &.played{
-                bottom: -40px;
                 pointer-events: none;
+                top: 40px;
             }
         }
     }
 
     .top{
-        height: calc(100% - 470px);
+        height: 40%;
+        min-height: 270px;
         overflow: hidden;
-        padding: 8px;
     }
 
     .top-board{
         display: flex;
         justify-content: space-between;
         align-items: flex-start;
+        padding: 8px;
+        padding-bottom: 16px;
     }
 
     .pick.selected{
@@ -81,6 +95,15 @@
         letter-spacing: 2px;
         color: #999;
         text-transform: uppercase;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+
+        &.need-to-act{
+            background-color: indianred;
+            border: none;
+            color:  #222;
+        }
 
         &.disabled{
             pointer-events: none;
@@ -91,17 +114,17 @@
 
         button{
             border-radius: 0;
-            color: peru;
+            color: #222;
             font-size: 26px;
             text-align: center;
             text-transform: uppercase;
             background-color: transparent;
             border: none;
-            border-top: 1px solid @color-main;
-            border-bottom: 1px solid @color-main;
+            border-top: 1px solid darkseagreen;
+            border-bottom: 1px solid darkseagreen;
             margin: 0;
             padding: 2px;
-            letter-spacing: 0.8;
+            letter-spacing: 0.6;
             flex: 1 0;
             white-space: nowrap;
             text-overflow: ellipsis;
@@ -109,13 +132,16 @@
             cursor: pointer;
             height: 100%;
             letter-spacing: 2.5px;
+            background-color: darkseagreen;
+            height: 40px;
 
             svg{
                 margin-left: 6px;
             }
 
             &:hover{
-                background-color: #444;
+                //background-color: #444;
+                opacity: 0.9;
             }
 
             &:focus{
@@ -123,7 +149,7 @@
             }
 
             &.less-than-nine{
-                font-size: 14px;
+                font-size: 16px;
                 letter-spacing: 2px;
 
                 svg{
@@ -135,6 +161,34 @@
             & + button{
                 border-left: 1px solid @color-main;
             }
+        }
+    }
+
+    .quick-played{
+        position: absolute;
+        pointer-events: none;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        color: peru;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        font-size: 3em;
+        text-shadow: 2px 2px 2px rgba(0,0,0,0.2);
+
+        animation: zoomInDown;
+        animation-duration: 0.8s;
+
+        &.out{
+            animation: zoomOutDown;
+            animation-duration: 0.8s;
+        }
+
+        svg{
+            margin: 16px;
         }
     }
 
@@ -151,8 +205,9 @@
 
         .fa-times{
             position: absolute;
-            top: 8px;
-            right: 8px;
+            top: 16px;
+            right: 16px;
+            cursor: pointer;
         }
 
         .winners{
@@ -167,6 +222,19 @@
 
         .playerHand{
             font-size: 20px;
+            border-radius: 16px;
+            border: 1px solid #333;
+            padding: 4px;
+            display: block;
+
+            &.winner{
+                border: 4px solid #333;
+            }
+
+            .name{
+                margin-right: 16px;
+                font-size: 24px;
+            }
 
             .hand {
                 margin-top: 8px;
@@ -182,4 +250,8 @@
             margin-top: 16px;
         }
     }
+}
+
+@media (max-width: @breakpoint-xs){
+    @import "./gameBoard-mobile";
 }
