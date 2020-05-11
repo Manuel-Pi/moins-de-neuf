@@ -6,10 +6,11 @@ type CardProps = {
     cardModel: CardModel
     style?: CSSProperties 
     className?: string
-    onClick?: (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => void
+    onClick?: (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => void,
+    ref?: any
 }
 
-export const Card = ({ cardModel, onClick, style, className = "" }: CardProps) => {
+export const Card = ({ cardModel, onClick, style, className = "", ref = null }: CardProps) => {
 
     let value = "";
     let values = [];
@@ -54,7 +55,7 @@ export const Card = ({ cardModel, onClick, style, className = "" }: CardProps) =
         symbols.push(<FontAwesomeIcon icon="carrot" size="lg"/>);
     }
 
-    return  <div className={cardModel.isTurned() ? "card turn " + className : "card notTurned " + className} onClick={onClick} style={style}>
+    return  <div ref={ref} className={cardModel.isTurned() ? "card turn " + className : "card notTurned " + className} onClick={onClick} style={style}>
                 {values}
                 <div className={`symbol value-${value}`}>
                     {symbols}

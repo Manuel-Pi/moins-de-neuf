@@ -24,7 +24,7 @@ type GameState = {
     action: string
     lessThanNine: boolean
     actionMessage: string
-    results: {scores:any, winners:{score: number, names: string[]}, players: any[]}
+    results: {scores:any, winners:{handScore: number, score: number, names: string[]}, players: any[], announcer:string}
     quickPlay: boolean,
     quickPlayed: string,
     quickPlayedOut: boolean,
@@ -123,7 +123,7 @@ export class GameBoard extends Component<GameProps, GameState> {
                 setTimeout(e => {this.setState({quickPlayed: null, quickPlayedOut: false});}, 800);
             }, 1600);
         });
-        this.props.socket.on("gameEnd", (results: {scores:any, winners:{score:any, names: []}, players:any[]}) => {
+        this.props.socket.on("gameEnd", (results: {scores:any, winners:{handScore: number, score:number, names: []}, players:any[], announcer:string}) => {
             this.setState({
                 results,
                 hand: [],
@@ -198,7 +198,7 @@ export class GameBoard extends Component<GameProps, GameState> {
 
         let action = this.state.action === "pick" ? "piocher" : "jouer";
         const playerName = this.state.isMyTurn ? "toi" : this.state.currentPlayer;
-        return `À  ${playerName} de ${action}`;
+        return <div className="animate__bounceIn">{`À  ${playerName} de ${action}`}</div>;
     }
 
     displayResults(){
@@ -206,15 +206,26 @@ export class GameBoard extends Component<GameProps, GameState> {
         const scores = this.state.results.scores;
         return  <div className="results">
                     <FontAwesomeIcon icon="times" size="2x" onClick={e => this.setState({results: null})}/>
+                    <h1 className="announcer">
+                        <FontAwesomeIcon icon="bullhorn" size="2x"/>
+                        {this.state.results.announcer} 
+                    </h1>
                     <h1 className="winners">
                         <FontAwesomeIcon icon="trophy" size="2x"/>
                         {winners.join(", ")} 
                     </h1>
-                    {Object.keys(this.state.results.scores).map(name =>
+                    {Object.keys(scores).map(name =>
                         <div className={"playerHand " + (winners.includes(name) ? 'winner' : '')}>
-                            <div>
+                            <div className="score-info">
                                 <span className="name">{name}</span>
-                                <Score score={scores[name].score} scoreStreak={scores[name].scoreStreak}/>
+                                <span className="hand-score">
+                                    <FontAwesomeIcon icon="hand-paper"/>
+                                    <Score score={scores[name].handScore} scoreStreak={0}/>
+                                </span>
+                                <span className="score">
+                                    <FontAwesomeIcon icon="file-signature"/>
+                                    <Score score={scores[name].score} scoreStreak={scores[name].scoreStreak}/>
+                                </span>
                             </div>
                             <Hand cardModels={scores[name].hand.map((card: any) => new CardModel(card))} turned/>
                         </div>

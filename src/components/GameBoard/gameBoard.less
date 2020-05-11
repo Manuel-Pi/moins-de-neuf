@@ -214,26 +214,62 @@
             display: flex;
             justify-content: center;
             align-items: center;
+            font-size: 50px;
 
-            .fa-trophy{
+            svg{
                 margin-right: 16px;
+                font-size: 50px;
+            }
+        }
+
+        .announcer{
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 32px;
+
+            svg{
+                margin-right: 16px;
+                font-size: 30px;
             }
         }
 
         .playerHand{
             font-size: 20px;
             border-radius: 16px;
-            border: 1px solid #333;
+            border: 4px solid #333;
             padding: 4px;
             display: block;
+            height: 100px;
+
+            .score-info{
+                display: flex;
+                justify-content: flex-start;
+                align-items: center;
+            }
 
             &.winner{
-                border: 4px solid #333;
+                background-color: #222;
+                color: #B25E18;
             }
 
             .name{
                 margin-right: 16px;
                 font-size: 24px;
+            }
+
+            .hand-score{
+                margin-right: 16px;
+
+                svg{
+                    margin-right: 4px;
+                }
+            }
+
+            .score{
+                svg{
+                    margin-right: 4px;
+                }
             }
 
             .hand {
