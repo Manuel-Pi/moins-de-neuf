@@ -1,0 +1,30 @@
+.tabs{
+    .titles{
+        display: flex;
+        justify-content: flex-start;
+        align-items: center;
+
+        span + span{
+            margin-left: 24px;
+        }
+
+        span{
+            opacity: 0.4;
+            cursor: pointer;
+
+            &.active{
+                opacity: 1;
+            }
+        }
+    }
+
+    .tabs-container{
+        > div {
+            display: none;
+
+            &.active{
+                display: block;
+            }
+        }
+    }
+}

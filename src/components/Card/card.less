@@ -19,6 +19,7 @@
     position: relative;
     background-color: #BBB;
     box-shadow: -1px 1px 1px rgba(0,0,0,0.2);
+    user-select: none;
 
     &.notTurned{
         background-color: #444; 
@@ -34,15 +35,22 @@
         position: absolute;
         padding: 8px;
         display: flex;
+        justify-content: center;
+        align-items: center;
 
         .joker{
             font-size: 26px;
         }
 
+        svg.icon{
+            width: 10px;
+            height: 14px;
+        }
+
         &:nth-child(1){
             top: 0;
             left: 0;
-            i{
+            i, svg{
                 order: 1;
             }
             span{
@@ -73,7 +81,7 @@
             bottom: 0;
             right: 0;
             transform: rotateZ(180deg);
-            i{
+            i, svg{
                 order: 1;
             }
             span{
@@ -96,7 +104,7 @@
         padding: 0.2em;
         justify-content: center;
         align-items: center;
-        height: 70%;
+        height: 64%;
         width: 70%;
         position: relative;
 
@@ -109,79 +117,83 @@
             }
         }
 
+        svg.icon{
+            width: 20px;
+        }
+
         &.value-2, &.value-3{
             flex-direction: column;
             justify-content: space-between;
         }
 
         &.value-4, &.value-5, &.value-6, &.value-7, &.value-8, &.value-9, &.value-10{
-            i{
+            svg{
                 position: absolute;
             }
-            i:nth-child(1){
+            svg:nth-child(1){
                 top: 0;
                 left: 0;
             }
-            i:nth-child(2){
+            svg:nth-child(2){
                 top: 0;
                 right: 0;
             }
-            i:nth-child(3){
+            svg:nth-child(3){
                 bottom: 0;
                 left: 0;
             }
-            i:nth-child(4){
+            svg:nth-child(4){
                 bottom: 0;
                 right: 0;
             }
         }
 
         &.value-6, &.value-7, &.value-8{
-            i:nth-child(5){
+            svg:nth-child(5){
                 left: 0;
             }
-            i:nth-child(6){
+            svg:nth-child(6){
                 right: 0;
             }  
         }
 
         &.value-7, &.value-8{
-            i:nth-child(7){
+            svg:nth-child(7){
                 top: 20%;
             } 
         }
 
         &.value-8{
-            i:nth-child(8){
+            svg:nth-child(8){
                 bottom: 20%;
             } 
         }
 
         &.value-9, &.value-10{
-            i:nth-child(5){
-                top: 25%;
+            svg:nth-child(5){
+                top: 28%;
                 left: 0;
             }
-            i:nth-child(6){
-                top: 25%;
+            svg:nth-child(6){
+                top: 28%;
                 right: 0;
             }  
-            i:nth-child(7){
-                bottom: 25%;
+            svg:nth-child(7){
+                bottom: 28%;
                 left: 0;
             } 
-            i:nth-child(8){
-                bottom: 25%;
+            svg:nth-child(8){
+                bottom: 28%;
                 right: 0;
             } 
         }
 
         &.value-10{
-            i:nth-child(9){
-                top: 20%;
+            svg:nth-child(9){
+                top: 14%;
             }
-            i:nth-child(10){
-                bottom: 20%;
+            svg:nth-child(10){
+                bottom: 14%;
             }
         }
 
@@ -218,10 +230,18 @@
 
     .heart, .diamond{
         color: #e02f1f;
+
+        g, path{
+            fill: #e02f1f;
+        }
     }
 
     .spade, .club{
         color: #222;
+
+        g, path{
+            fill: #222;
+        }
     }
 }
 @media (max-width: @breakpoint-xs){

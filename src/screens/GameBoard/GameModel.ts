@@ -1,5 +1,5 @@
-import { CardModel, CardParser } from "../Card/CardModel";
-import { PlayerModel } from "../Player/PlayerModel";
+import { CardModel, CardParser } from "../../components/Card/CardModel";
+import { PlayerModel } from "../../components/Player/PlayerModel";
 
 
 type GameJsonProps = {
@@ -8,7 +8,23 @@ type GameJsonProps = {
     name: string
     cards: any[]
     players: any[]
-    quikPlay: boolean
+    quickPlay: boolean
+    conf: GameInfo
+}
+
+export type GameInfo = {
+    name: string,
+    minPlayer: number,
+    maxPlayer: number,
+    allowQuickPlay: boolean,
+    allowStreak: boolean,
+    allowWinEquality: boolean,
+    onlyOneWinnerStreak: boolean,
+    bonusMultiple50: boolean,
+    playerKickTimeout: string,
+    gameKickTimeout: string,
+    gameEndScore: number,
+    gameEndTime: string
 }
 
 export class GameModel{
@@ -17,7 +33,9 @@ export class GameModel{
     private name: string;
     private playedCards: CardModel[] = [];
     private playerModels: PlayerModel[] = [];
+    private quickPlay: boolean;
     private turn: number = 0;
+    private conf: GameInfo = null;
 
     constructor(props: GameJsonProps){
         this.action = props.action;
@@ -25,10 +43,20 @@ export class GameModel{
         this.name = props.name;
         this.playedCards = props.cards ? props.cards.map(card => new CardModel(card)): [];
         this.playerModels = props.players ? props.players.map(player => new PlayerModel(player)): [];
+        this.quickPlay = props.quickPlay;
+        this.conf = props.conf;
     }
 
     public getAction() {
         return this.action;
+    }
+
+    public getConf(){
+        return this.conf;
+    }
+
+    public isQuickPlay() {
+        return this.quickPlay;
     }
 
     public getCurrentPlayer() {

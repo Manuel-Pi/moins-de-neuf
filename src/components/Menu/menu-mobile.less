@@ -1,0 +1,78 @@
+.menu-bar{
+    font-size: 8px;
+
+    .name{
+        font-size: 16px;
+    }
+
+    .menu{
+        height: calc(100vh ~"-" 40px);
+        width: 100%;
+        position: absolute;
+        z-index: 300;
+        top: 40px;
+        display: none;
+        background-color: @color-main-medium-dark;
+        padding-bottom: 80px;
+        overflow: hidden;
+
+        &.has-current-game{
+            .current-game{
+                visibility: visible;
+            }
+        }
+
+        .current-game{
+            height: 60px;
+            padding: 16px;
+            width: 100%;
+            background-color:rgba(0,0,0,0.4);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            visibility: hidden;
+
+            .current-info{
+                width: 60%;
+                display: inline-block;
+                min-width: 150px;s
+
+                .label{
+                    font-size: 14px;
+                    color: @color-main;
+                }
+
+                .game-name{
+                    font-size: 16px;
+                }
+            }
+
+            span{
+                font-size: 10px;
+                padding: 4px 8px;
+            }
+        }
+
+        .general{
+            width: 100%;
+
+            > div{
+                height: 100px;
+                width: 150px;
+    
+                svg{
+                    font-size: 40px;
+                }
+    
+                span{
+                    font-size: 16px;
+                    padding: 8px;
+                }
+            }
+        }
+    }
+
+    .disconnect{
+        font-size: 40px;
+    }
+}  

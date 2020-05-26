@@ -1,19 +1,20 @@
 import React, { Component } from 'react';
-import {Hand} from "../Hand/Hand";
-import { CardModel, CardParser } from '../Card/CardModel';
-import { Card } from '../Card/Card';
-import { PlayerModel } from '../Player/PlayerModel';
-import { Players } from '../Player/Players';
+import {Hand} from "../../components/Hand/Hand";
+import { CardModel, CardParser } from '../../components/Card/CardModel';
+import { Card } from '../../components/Card/Card';
+import { PlayerModel } from '../../components/Player/PlayerModel';
+import { Players } from '../../components/Player/Players';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { GameModel, CheckPlayedCards } from './GameModel';
-import { CreateClassName } from '../Utils/Utils';
-import { Score } from '../Player/Score';
-import { GameBoardModel } from './GameBoardModel';
+import { CreateClassName } from '../../utils/Utils';
+import { Score } from '../../components/Player/Score';
+import { Logo } from '../../components/Logo/Logo';
+import { Modal } from '../../components/Modal/Modal';
+import { Table } from '../../components/Table/Table';
 
 type GameState = {
     menuActive: boolean,
     games: any[]
-    currentGame: string
     playedCards: CardModel[][]
     hand: CardModel[]
     currentSelection: CardModel[]
@@ -28,12 +29,20 @@ type GameState = {
     quickPlay: boolean,
     quickPlayed: string,
     quickPlayedOut: boolean,
+    quickPlayedBashed: string,
+    gameEnd: string,
+    displayEnd: boolean,
+    startTime: number,
+    turn: number,
+    round: number,
+    roundStartTime: number
 }
 
 type GameProps = {
     socket: any
     username: string
     className: string
+    currentGame: string
 }
 
 export class GameBoard extends Component<GameProps, GameState> {
@@ -41,10 +50,9 @@ export class GameBoard extends Component<GameProps, GameState> {
     static  defaultProps: GameProps = {
         socket: null,
         username: "",
-        className: ""
+        className: "",
+        currentGame: null
     }
-
-    private resultPlayerGame:any = null;
 
     private pickCard: CardModel = new CardModel({value: "0", color: "heart"});
 
@@ -53,7 +61,6 @@ export class GameBoard extends Component<GameProps, GameState> {
         this.state = {
             menuActive: true,
             games: [],
-            currentGame: null,
             playedCards: [],
             hand: [],
             currentSelection: [],
@@ -67,7 +74,14 @@ export class GameBoard extends Component<GameProps, GameState> {
             results: null,
             quickPlay: false,
             quickPlayed: null,
-            quickPlayedOut: false
+            quickPlayedOut: false,
+            quickPlayedBashed: null,
+            gameEnd: null,
+            displayEnd: false,
+            startTime: 0,
+            turn: 0,
+            round: 0,
+            roundStartTime: 0
         }
     }
 
@@ -84,17 +98,22 @@ export class GameBoard extends Component<GameProps, GameState> {
                 lessThanNine: hand.reduce((sum, card) => sum + card.getIntValue(), 0) < 10
             });
         });
-        this.props.socket.on("gameInfo", (gameInfo:{name: string, players: any[], playedCards: any[], currentPlayer: string, action: string, quickPlay: boolean}) => {
+        this.props.socket.on("gameInfo", (gameInfo:{name: string, players: any[], playedCards: any[], currentPlayer: string, action: string, quickPlay: boolean, gameEnd: null, startTime: number, turn: number, round: number, roundStartTime: number}) => {
+            if(!gameInfo) return;
             this.setState({
                 menuActive: false,
-                currentGame: gameInfo.name,
                 playedCards: gameInfo.playedCards.map(cards => cards.map((card: any) => new CardModel({...card, turned: true}))),
                 players: gameInfo.players.map(player => new PlayerModel(player)),
                 currentPlayer: gameInfo.currentPlayer,
                 action: gameInfo.action,
                 isMyTurn: gameInfo.currentPlayer === this.props.username,
                 pickSelection: null,
-                quickPlay: gameInfo.quickPlay
+                quickPlay: gameInfo.quickPlay,
+                gameEnd: gameInfo.gameEnd,
+                startTime: gameInfo.startTime,
+                turn: gameInfo.turn,
+                round: gameInfo.round,
+                roundStartTime: gameInfo.roundStartTime
             });
         });
         this.props.socket.on("selectedPick", (card: any) => {
@@ -123,7 +142,14 @@ export class GameBoard extends Component<GameProps, GameState> {
                 setTimeout(e => {this.setState({quickPlayed: null, quickPlayedOut: false});}, 800);
             }, 1600);
         });
-        this.props.socket.on("gameEnd", (results: {scores:any, winners:{handScore: number, score:number, names: []}, players:any[], announcer:string}) => {
+        this.props.socket.on("bash", (playerName: string) => {
+            this.setState({quickPlayedBashed: playerName});
+            setTimeout(e => {
+                this.setState({quickPlayedOut: true});
+                setTimeout(e => {this.setState({quickPlayed: null, quickPlayedOut: false});}, 800);
+            }, 1600);
+        });
+        this.props.socket.on("roundEnd", (results: {scores:any, winners:{handScore: number, score:number, names: []}, players:any[], announcer:string}) => {
             this.setState({
                 results,
                 hand: [],
@@ -185,37 +211,53 @@ export class GameBoard extends Component<GameProps, GameState> {
         previousIndex = previousIndex < 0 ? this.state.players.length - 1 : previousIndex;
         const isLastPlayer = this.state.players[previousIndex].getName() === this.props.username;
             
-        if(this.state.isMyTurn || (this.state.quickPlay && isLastPlayer)){
+        if(this.state.isMyTurn || (this.state.quickPlay && isLastPlayer && this.state.turn > 1)){
             const buttons = [];
             if((this.state.pickSelection && this.state.action === "pick") || (this.state.currentSelection.length && this.state.action === "play")){
-                buttons.push(<button onClick={() => this.action()}>jouer<FontAwesomeIcon icon="check"/></button>);
+                buttons.push(<button className="animate__animated animate__pulse animate__infinite" onClick={() => this.action()}>jouer<FontAwesomeIcon icon="check"/></button>);
             }
             if(this.state.isMyTurn && this.state.lessThanNine && this.state.action === "play"){
-                buttons.push(<button className="less-than-nine" onClick={() => this.lessThanNine()}>moins de neuf<FontAwesomeIcon icon={['fab', 'angellist']}/></button>);
+                buttons.push(<button className="less-than-nine" onClick={() => this.lessThanNine()}>moins de neuf<FontAwesomeIcon icon={'bullhorn'}/></button>);
             }
             if(buttons.length) return buttons;
         }
 
         let action = this.state.action === "pick" ? "piocher" : "jouer";
         const playerName = this.state.isMyTurn ? "toi" : this.state.currentPlayer;
-        return <div className="animate__bounceIn">{`À  ${playerName} de ${action}`}</div>;
+        return <div className="action animate__animated animate__bounceIn">À<span className="animate__animated animate__tada">{playerName}</span>de {action}</div>;
     }
 
     displayResults(){
         const winners = this.state.results.winners.names as string[];
         const scores = this.state.results.scores;
         return  <div className="results">
-                    <FontAwesomeIcon icon="times" size="2x" onClick={e => this.setState({results: null})}/>
-                    <h1 className="announcer">
-                        <FontAwesomeIcon icon="bullhorn" size="2x"/>
-                        {this.state.results.announcer} 
-                    </h1>
-                    <h1 className="winners">
-                        <FontAwesomeIcon icon="trophy" size="2x"/>
+                    <FontAwesomeIcon icon="times" size="2x" onClick={e => this.setState({results: null, displayEnd: !!this.state.gameEnd})}/>
+                    <div className="announcer animate__animated animate__jackInTheBoxPizi">
+                        <Logo/>
+                        <h1>
+                            <FontAwesomeIcon icon="bullhorn" size="2x"/>
+                            {this.state.results.announcer} 
+                        </h1>
+                    </div>
+                    <h1 className="winners animate__delay-2s animate__animated  animate__jackInTheBox">
+                        <FontAwesomeIcon icon="trophy" size="2x" className="animate__animated animate__swing animate__infinite"/>
                         {winners.join(", ")} 
                     </h1>
-                    {Object.keys(scores).map(name =>
-                        <div className={"playerHand " + (winners.includes(name) ? 'winner' : '')}>
+                    <div className="game-info">
+                        <span className="time animate__animated animate__fadeIn animate__delay-3s">Durée:<b>{Math.round(((new Date()).getTime() - this.state.roundStartTime) / 60000) + "min"}</b></span>
+                        <span className="turn animate__animated animate__fadeIn animate__delay-3s">Tours:<b>{this.state.turn}</b></span>
+                    </div>
+                    {Object.keys(scores).sort((first, second) => {
+                        if(scores[first].handScore < scores[second].handScore) return -1;
+                        if(scores[first].handScore >scores[second].handScore) return 1;
+                        if(scores[first].handScore ===scores[second].handScore) {
+                            if(scores[first].scoreStreak <scores[second].scoreStreak) return 1;
+                            if(scores[first].scoreStreak >scores[second].scoreStreak) return -1;
+                            return 0;
+                        }
+                    }).map((name,i) =>
+                        <div className={"playerHand " + (winners.includes(name) ? 'winner' : '') + " animate__delay-2s animate__animated animate__backInUp"}
+                            style={{animationDelay: (2 + i * 0.4) + "s"}}>
                             <div className="score-info">
                                 <span className="name">{name}</span>
                                 <span className="hand-score">
@@ -236,11 +278,42 @@ export class GameBoard extends Component<GameProps, GameState> {
     displayQuickPlayed(){
         return  <div className={"quick-played " + (this.state.quickPlayedOut ? "out" : "")}>
                     <div>{this.state.quickPlayed + " a joué rapidement!"}</div>
-                    <FontAwesomeIcon icon="kiss-wink-heart" size="2x" className="" onClick={e => this.setState({results: null})}/>
+                    <FontAwesomeIcon icon="kiss-wink-heart" size="2x"/>
                 </div>
+    }
+
+    displayBash(){
+        return  <div className={"quick-played " + (this.state.quickPlayedBashed ? "out" : "")}>
+                    <div>{this.state.quickPlayed + " s'est fait bashé!"}</div>
+                    <FontAwesomeIcon icon="ban" size="2x"/>
+                </div>
+    }
+
+    displayEndGame(){
+        return <Modal onClose={() => this.props.socket.emit("quit")} className={"end-game"}>
+            <h2>Fin de partie <FontAwesomeIcon icon="flag-checkered"/></h2>
+            <span className="animate__animated animate__fadeIn animate__delay-1s">{ this.state.gameEnd === "time" ? "Temps max atteint" : "Score max atteint"}</span>
+            <h3 className="time animate__animated animate__fadeIn animate__delay-2s">Durée:<b>{Math.round(((new Date()).getTime() - this.state.startTime) / 60000) + "min"}</b></h3>
+            <h3 className="turn animate__animated animate__fadeIn animate__delay-2s">Manches:<b>{this.state.round}</b></h3>
+            <Table  className="animate__animated animate__fadeIn animate__delay-3s"
+                    header={["#", "Pseudo", "Score"]} 
+                    body={this.state.players.map((player, index) => [index + 1, player.getName(), <Score score={player.getScore()} scoreStreak={player.getScoreStreak()}/>])}
+                    animation="animate__backInUp-reverse"
+                    animationDelay={4} animationIncrement={1.5}/>
+            <FontAwesomeIcon className="animate__animated animate__fadeIn animate__delay-4s"
+                icon="redo" onClick={ e => {
+                this.setState({displayEnd: false, results: null, gameEnd: null, hand: [], currentPlayer: null});
+                }}/>
+            <FontAwesomeIcon className="animate__animated animate__fadeIn animate__delay-4s"
+                icon="sign-out-alt" onClick={ e => {
+                this.props.socket.emit("quit");
+                this.setState({displayEnd: false, results: null, gameEnd: null, hand: [], currentPlayer: null});
+                }}/>
+        </Modal>
     }
     
     render(){
+        if(!this.props.currentGame) return null;
         const className = CreateClassName({
             "gameboard": true,
             "my-turn": this.state.isMyTurn,
@@ -282,7 +355,9 @@ export class GameBoard extends Component<GameProps, GameState> {
                         <Hand cardModels={this.state.hand} selectedCardModels={this.state.currentSelection} onSelected={ cardModel => this.selectCard(cardModel)}/>
                     </div>
                     {this.state.results && this.displayResults()}
+                    {this.state.gameEnd && this.state.displayEnd && this.displayEndGame()}
                     {this.state.quickPlayed && this.displayQuickPlayed()}
+                    {this.state.quickPlayedBashed && this.displayBash()}
                 </div>
     }
 }

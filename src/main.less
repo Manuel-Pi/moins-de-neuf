@@ -21,12 +21,13 @@
 @letter-spacing: 1.8px;
 
 @breakpoint-xs: 500px;
+@breakpoint-sm: 400px;
 
 @app-max-width: 800px;
 
 html, body, app{
     height: 100vh;
-    min-height: 650px;
+    min-height: 500px;
     width: 100vw;
 }
 
@@ -41,25 +42,20 @@ body{
     box-sizing: border-box;
 }
 
-table, input{
-    outline: none;
-    min-width: 200px;
-    table-layout: fixed;
-    overflow-wrap: break-word;
+h2{
+    font-weight: normal;
+    font-size: 36px;
+    margin-top: 0;
 
-    tbody{
-        display:block;
-        overflow:auto;
-        height:300px;
-        width:100%;
-    }
-
-    thead tr{
-        display:block;
+    @media (max-width: @breakpoint-xs){
+        font-size: 20px;
     }
 }
 
+
 input{
+    outline: none;
+    min-width: 200px;
     height: 50px;
     font-size: 30px;
     line-height: 30px;
@@ -96,42 +92,13 @@ button{
     }
 }
 
-table{
-    width: 100%;
-    border-collapse: collapse;
-
-    thead{
-        border-bottom: @border;
-        color: @color-black;
-    }
-
-    th, td{
-        text-align: left;
-        font-size: 24px;
-        font-weight: 100;
-        letter-spacing: 1.8px;
-        padding: 8px 16px;
-        color: @color-black;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-    }
-
-    tr:hover{
-        cursor: pointer;
-        td{
-            background-color: @color-main-light;
-            color: @color-hover;
-        }
-    }
-
-    tr + tr {
-        border-top: @border-light;
-    }
+.hidden{
+    display: none !important;
 }
 
-.hidden{
-    display: none;
+.disabled{
+    opacity: 0.3;
+    pointer-events: none;
 }
 
 app{
@@ -151,10 +118,17 @@ app{
     } 
 }
 
-@import "./components/GameBoard/gameBoard";
 @import "./components/Card/card";
 @import "./components/Hand/hand";
 @import "./components/Player/player";
 @import "./components/Logo/logo";
 @import "./components/Menu/menu";
-@import "./components/Lobby/lobby";
+@import "./components/Modal/modal";
+@import "./components/Input/inputs";
+@import "./components/Tabs/tabs";
+@import "./components/Table/table";
+@import "./screens/GameBoard/gameBoard";
+@import "./screens/Lobby/lobby";
+@import "./screens/Login/login";
+@import "./screens/Players/players";
+@import "./app";

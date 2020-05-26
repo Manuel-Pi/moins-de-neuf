@@ -17,12 +17,28 @@ import { faCheck,
         faReceipt,
         faHandPaper,
         faFileSignature,
-        faBullhorn} from '@fortawesome/free-solid-svg-icons';
-import { faAngellist } from '@fortawesome/free-brands-svg-icons';
-import { Lobby } from "./components/Lobby/Lobby";
+        faBullhorn,
+        faPlus,
+        faSignOutAlt,
+        faSignInAlt,
+        faMinus,
+        faPuzzlePiece,
+        faList,
+        faUsers,
+        faChartBar,
+        faUserCog,
+        faToggleOff,
+        faToggleOn,
+        faAngleRight,
+        faAngleLeft,
+        faInfo,
+        faPowerOff,
+        faRedo,
+        faFlagCheckered,
+        faBan} from '@fortawesome/free-solid-svg-icons';
+import { App } from "./App";
 // Add custom icon to Font Awesome
-library.add(faAngellist, 
-            faCheck, 
+library.add(faCheck, 
             faGraduationCap, 
             faCannabis, 
             faChessQueen, 
@@ -38,15 +54,30 @@ library.add(faAngellist,
             faReceipt,
             faHandPaper,
             faFileSignature,
-            faBullhorn);
+            faBullhorn,
+            faPlus,
+            faSignOutAlt,
+            faSignInAlt,
+            faMinus,
+            faPuzzlePiece,
+            faList,
+            faUsers,
+            faChartBar,
+            faUserCog,
+            faToggleOff,
+            faToggleOn,
+            faAngleRight,
+            faAngleLeft,
+            faInfo,
+            faPowerOff,
+            faRedo,
+            faFlagCheckered,
+            faBan);
 // Used for webpack to load less
 !!style;
-React === React;
+!!React;
 // Init Socket,io
 declare const io: any;
-declare const ENV_PORT: any, ENV_URL: any;
-
 // Get Socket.io
 let socket = io('/pizi-moins-de-neuf');
-
-ReactDOM.render(<Lobby socket={socket} username={null}/>, document.getElementsByTagName("app")[0]);
+ReactDOM.render(<App socket={socket}/>, document.getElementsByTagName("app")[0]);

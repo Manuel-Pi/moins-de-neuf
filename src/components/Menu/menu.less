@@ -14,6 +14,17 @@
     background-color: #222;
     max-width: @app-max-width;
     margin: 0 auto;
+    z-index: 200;
+
+    .logo{
+        height: 32px;
+
+        svg{
+            > g{
+                fill: #888;
+            }
+        }
+    }
 
     .name{
         color: #AAA; 
@@ -31,4 +42,111 @@
         padding: 8px;
         cursor: pointer;
     }
+
+    .menu{
+        height: calc(100vh ~"-" 40px);
+        width: 100%;
+        position: absolute;
+        z-index: 300;
+        top: 40px;
+        display: none;
+        background-color: @color-main-medium-dark;
+        padding-bottom: 80px;
+        overflow: hidden;
+
+        &.has-current-game{
+            .current-game{
+                visibility: visible;
+            }
+        }
+
+        .current-game{
+            height: 60px;
+            padding: 16px;
+            width: 100%;
+            background-color:rgba(0,0,0,0.4);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            visibility: hidden;
+
+            .current-info{
+                width: 60%;
+                display: inline-block;
+
+                .label{
+                    font-size: 14px;
+                    color: @color-main;
+                }
+
+                .game-name{
+                    font-size: 28px;
+                    color: #bbb;
+                }
+            }
+
+            span{
+                font-size: 22px;
+                padding: 8px 26px;
+                color: #aaa;
+                cursor: pointer;
+
+                &:hover{
+                    color: #bbb;
+                }
+            }
+        }
+
+        .general{
+            display: inline-flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            height: calc(100% ~"-" 100px);
+            width: 400px;
+            overflow: hidden;
+
+            > div{
+                display: inline-block;
+                height: 200px;
+                width: 200px;
+                color: @color-black;
+                display: inline-flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                cursor: pointer;
+    
+                svg{
+                    font-size: 50px;
+                }
+    
+                span{
+                    font-size: 20px;
+                    padding: 8px;
+                }
+            }
+        }
+
+        &.active{
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            flex-wrap: wrap;
+            flex-direction: column;
+        }
+    }
+
+    .disconnect{
+        position: absolute;
+        bottom: 26px;
+        margin: 0 auto;
+        font-size: 50px;
+        color: #222;
+        cursor: pointer;
+    }
 }  
+
+@media (max-width: @breakpoint-xs){
+    @import "./menu-mobile";
+}

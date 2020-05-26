@@ -20,8 +20,11 @@ export const Hand = ({cardModels, onSelected, selectedCardModels=[], className =
     }, [handRef]);
 
     const lastWidth = width!== null && handRef.current.getBoundingClientRect().width;
-    let lastCardWidth = (handRef.current && handRef.current.children[0] && handRef.current.children[0].getBoundingClientRect().width + 1) || 120;
-
+    let lastCardWidth = handRef.current && handRef.current.children[0] && handRef.current.children[0].getBoundingClientRect().width + 1;
+    if(!lastCardWidth){
+        lastCardWidth = window.matchMedia( "(max-width: 500px)" ).matches ? 95 : 120;
+    }
+    
     function clickHandler(cardModel: CardModel){
         if(!turnedList){
             setTurnedList(true);

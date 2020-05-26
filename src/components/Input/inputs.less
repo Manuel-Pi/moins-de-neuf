@@ -1,0 +1,19 @@
+@import "./text-input";
+@import "./number-input";
+@import "./list-input";
+@import "./checkbox";
+
+.input + .input{
+    margin-top: 20px;
+}   
+
+.input{
+    .placeholder{
+        color: @color-main-medium-dark;
+        font-size: 14px;
+    }
+
+    &.disabled{
+        opacity: 0.9;
+    }
+}

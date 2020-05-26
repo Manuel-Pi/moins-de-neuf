@@ -1,4 +1,4 @@
-import { CardModel, Color } from "../Card/CardModel";
+import { CardModel, Color } from "../../components/Card/CardModel";
 
 export class GameBoardModel{
 

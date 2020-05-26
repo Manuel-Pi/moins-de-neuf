@@ -10,7 +10,7 @@ type PlayersProps = {
 }
 
 export const Players = ({ playerModels, className = "", currentPlayer}: PlayersProps) => {
-    return  <div className={"players"}>
+    return  <div className={"players-info"}>
                 <table>
                     <tbody>
                     {
@@ -31,7 +31,7 @@ export const Players = ({ playerModels, className = "", currentPlayer}: PlayersP
                                 <td className="name">
                                     {playerModel.getName()}
                                 </td>
-                                <td className="score">
+                                <td className="score-td">
                                     <Score score={playerModel.getScore()} scoreStreak={playerModel.getScoreStreak()}/>
                                 </td>
                             </tr>)

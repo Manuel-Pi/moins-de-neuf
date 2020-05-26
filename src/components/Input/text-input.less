@@ -1,0 +1,32 @@
+.text-input{
+    position: relative;
+    padding-top: 14px;
+
+    &.empty:not(.focus){
+        .placeholder{
+            top: 10px;
+            font-size: 24px;
+            opacity: 0.6;
+            color: #888;
+        }
+    }
+
+    .placeholder{
+        position: absolute;
+        top: 0;
+        left: 0;
+        transition: all ease 0.4s;
+    }
+
+    
+    input{
+        background-color: transparent;
+        border: none;
+        border-bottom: 1px solid #555;
+        border-radius: 0;
+        font-size: 24px;
+        height: auto;
+        text-indent: 0;
+        color: #888;
+    }   
+}

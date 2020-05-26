@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "webpack --env.production",
+    "build": "webpack --env.production --json > stats.json",
     "deploy": "npm run build && mkdir -p ../pizi-express-server/apps/moins-de-neuf && rm -f -r ../pizi-express-server/apps/moins-de-neuf/* && cp -R ./dist/* ../pizi-express-server/apps/moins-de-neuf"
   },
   "author": "Manuel-Pi",
@@ -19,6 +19,7 @@
     "file-loader": "^6.0.0",
     "less": "^3.11.1",
     "less-loader": "^5.0.0",
+    "optimize-css-assets-webpack-plugin": "^5.0.3",
     "source-map-loader": "^0.2.4",
     "style-loader": "^1.1.4",
     "ts-loader": "^7.0.0",

@@ -1,0 +1,42 @@
+.number-input{
+
+    .input-container{
+        display: flex;
+        justify-content: flex-start;
+        align-items: center;
+        margin-top: 8px;
+
+        span{
+            font-size: 24px;
+            padding: 0 22px;
+            width: 150px;
+            text-align: center;
+        }
+    }
+
+    svg{
+        font-size: 24px;
+        cursor: pointer;
+    }
+
+    &.disabled{
+        opacity: 0.9;
+        svg{
+            opacity: 0.2;
+        }
+    } 
+    
+    &.is-max{
+        .fa-plus{
+            opacity: 0.2;
+            pointer-events: none;
+        }
+    }
+
+    &.is-min{
+        .fa-minus{
+            opacity: 0.2;
+            pointer-events: none;
+        }
+    }
+}

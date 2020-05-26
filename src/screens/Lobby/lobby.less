@@ -1,0 +1,228 @@
+.lobby{
+    width: 100%;
+    height: 100%;
+    background-color: #B25E18;
+    color: #222;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 40px 0;
+    position: relative;
+
+    h1{
+        margin: 0;
+        width: 100%;
+        padding: 36px 0;
+        padding-bottom: 36px;
+        font-size: 50px;
+        max-width: 500px;
+        flex: 0 0;
+    }
+
+    .games{
+        max-width: 500px;
+        width: 100%;
+        flex: 1 auto;
+
+        .header{
+            background-color: @color-main-medium-dark;
+        }
+
+        th{
+            &:nth-child(1){
+                width: 200px;
+            }
+            &:nth-child(2){
+                width: 100px;
+            }
+            &:nth-child(3){
+                width: 100px;
+            }
+        }
+
+        td{
+            &:nth-child(1){
+                
+            }
+            &:nth-child(2){
+                text-align: center;
+                letter-spacing: 4px;
+                font-size: 18px;
+                font-weight: 900;
+            }
+            &:nth-child(3){
+                font-size: 14px;
+            }
+        }
+    
+        .selected{
+            td{
+                background-color: #333;
+                color: @color-main;
+            }
+        }
+    
+        > .actions{
+            padding: 40px 20px 8px 20px;
+            font-size: 26px;
+
+            svg{
+                cursor: pointer;
+
+                &:active{
+                    animation-iteration-count: 1;
+                }
+            }
+
+            svg + svg{
+                margin-left: 40px;
+            }
+    
+            svg.disabled{
+                pointer-events: none;
+                opacity: 0.3;
+            }
+
+            svg.join, svg.quit{
+                float: right;
+            }
+        }
+    }
+
+    .modal{
+        .create{
+            text-align: center;
+            font-size: 38px;
+            color: #888;
+            margin-top: 26px;
+            cursor: pointer;
+            border-top: 1px solid #444;
+            padding-top: 8px;
+        }
+
+        .tabs{
+            h2{
+                padding-bottom: 8px;
+            }
+            .active h2{
+                border-bottom: 1px solid #555;
+            }
+        }
+
+        .players-info{
+            width: 100%;
+
+            .header{
+                border-bottom: 1px solid @color-main-medium-dark;
+            }
+
+            th{
+                color: @color-main-medium-dark;
+                font-size: 14px;
+
+                &:nth-child(1){
+                    width: 40px;
+                    font-size: 24px;
+                    text-align: center;
+                }
+
+                &:nth-child(2){
+                    width: 280px;
+                }
+
+                &:nth-child(3){
+                    width: 80px;
+                }
+            }
+
+            td{
+                color: #888;
+                font-size: 24px;
+
+                &:nth-child(1){
+                    font-size: 28px;
+                    width: 40px;
+                    text-align: center;
+                }
+
+                &:nth-child(2){
+                    width: 280px;
+                }
+
+                &:nth-child(3){
+                    width: 80px;
+                }
+            }
+        }        
+    }
+
+    @media (max-width: @breakpoint-xs){
+        padding-bottom: 0;
+        
+        h1{
+            padding: 16px 4px;
+            font-size: 40px;
+        }
+        .login .logo{
+            width: 300px;
+            margin-bottom: 0px;
+        }
+
+        table td, table th{
+            font-size: 16px;
+        }
+
+        .table{
+            .actions{
+                padding: 16px;
+
+                svg{
+                    font-size: 24px;
+                }
+            }
+        }
+
+        .games{
+            width: 320px;
+            height: calc(100% - 60px);
+
+            th{
+                font-size: 12px;
+            }
+
+           td{
+               font-size: 14px;
+
+               &:nth-child(2){
+                    font-size: 16px;
+               }
+
+               &:nth-child(3){
+                    font-size: 10px;
+                    letter-spacing: 1px;
+                }
+           }
+        }
+
+        .modal{
+            .players-info{
+
+                td{
+                    font-size: 18px;
+
+                    &:nth-child(1){
+                        font-size: 16px;
+                   }
+                }
+            }
+        }
+    }
+
+
+    @media (max-width: @breakpoint-sm){
+        .games{
+            width: 304px;
+        }
+    }
+}
