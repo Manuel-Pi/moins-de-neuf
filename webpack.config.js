@@ -1,10 +1,10 @@
 const webpack = require('webpack');
-var OptimizeCSSAssetsPlugin = require("optimize-css-assets-webpack-plugin");
+const CopyPlugin = require('copy-webpack-plugin');
 module.exports = {
     mode: "production",
 
     // Enable sourcemaps for debugging webpack's output.
-    devtool: false,
+    devtool: "source-map",
 
     output:{
         libraryTarget: 'umd',
@@ -44,7 +44,10 @@ module.exports = {
                     },
                     "extract-loader",
                     {
-                        loader: "css-loader"
+                        loader: "css-loader",
+                        options: {
+                            sourceMap: true
+                        }
                     },
                     "less-loader"
                 ]
@@ -54,13 +57,18 @@ module.exports = {
     plugins:[
         /*new webpack.DefinePlugin({
             ENV_PORT: JSON.stringify(process.env.PORT),
-        })*/
-    ],
-    optimization: {
-        minimizer: [
-          new OptimizeCSSAssetsPlugin({})
-        ]
-      }
+        }),*/
+        new CopyPlugin({
+            patterns: [
+                "src/index.html",
+                "src/moins-de-neuf.png",
+                {
+                    from: "src/server",
+                    to: "server"
+                }
+            ],
+          })
+    ]
 
     // When importing a module whose path matches one of the following, just
     // assume a corresponding global variable exists and use that instead.
