@@ -130,6 +130,10 @@ button{
     top: -3px !important;
     right: 42px !important;
     bottom: auto !important;
+
+    @media (min-width: @app-max-width){
+        right: calc(50% - 400px + 42px) !important;
+    }
 }
 
 @keyframes spin {  
