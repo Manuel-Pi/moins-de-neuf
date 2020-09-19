@@ -4,7 +4,7 @@ module.exports = {
     mode: "production",
 
     // Enable sourcemaps for debugging webpack's output.
-    devtool: false,
+    devtool: "source-map",
 
     output:{
         libraryTarget: 'umd',

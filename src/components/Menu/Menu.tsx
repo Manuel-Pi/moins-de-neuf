@@ -8,12 +8,13 @@ type MenuProps = {
     className: string
     username: string
     onClick?: (data:any) => void
+    onDoubleClick?: () => void
     currentGame: string
     onDisconnect: () => void
     onQuit: () => void
 }
 
-export const Menu = ({username, onClick, className = "", currentGame = null, onDisconnect, onQuit}:MenuProps) => {
+export const Menu = ({username, onClick, className = "", currentGame = null, onDisconnect, onQuit, onDoubleClick}:MenuProps) => {
 
     const [open, setOpen] = useState(false);
 
@@ -30,7 +31,7 @@ export const Menu = ({username, onClick, className = "", currentGame = null, onD
 
     onDisconnect = onDisconnect || (() => null);
 
-    return  <div className={"menu-bar " + className}>
+    return  <div className={"menu-bar " + className} onDoubleClick={ e => onDoubleClick && onDoubleClick()}>
                 <Logo/>
                 <span className="name">{username}</span>
                 <FontAwesomeIcon icon="bars" className="menu-button" onClick={ e => setOpen(!open)}/>

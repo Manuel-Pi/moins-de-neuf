@@ -23,6 +23,7 @@ type AppState = {
     username: string
     currentGame: string
     currentScreen: SCREEN
+    piziChat: any
 }
 
 export class App extends Component<AppProps, AppState> {
@@ -32,7 +33,8 @@ export class App extends Component<AppProps, AppState> {
         this.state = {
             username: localStorage.getItem("username"),
             currentGame: null,
-            currentScreen: SCREEN.LOGIN
+            currentScreen: SCREEN.LOGIN,
+            piziChat: null
         }
     }
 
@@ -44,16 +46,25 @@ export class App extends Component<AppProps, AppState> {
 
         // Connection accepted
         this.props.socket.on("setGames", (games:any) => {
+            if(!this.state.username) return;
             const username = this.state.username;
             localStorage.setItem("username", username);
+
+            let piziChat = this.state.piziChat;
+            if(!piziChat){
+                piziChat = new PiziChat();
+                piziChat.login(username, "moinsdeneuf");
+            }
+
             this.setState({
+                piziChat, 
                 username,
                 currentScreen: this.state.currentScreen === SCREEN.LOGIN ? SCREEN.LOBBY : this.state.currentScreen
             });
         });
 
         this.props.socket.on("gameInfo", (game:any) => {
-           if(!game) this.setState({
+           if(this.state.username && !game) this.setState({
                 currentScreen: SCREEN.LOBBY
             });
         });
@@ -65,27 +76,28 @@ export class App extends Component<AppProps, AppState> {
             this.setState({
                 username: disconnectUser ? null : this.state.username,
                 currentGame: null,
-                currentScreen: disconnectUser ? SCREEN.LOGIN : this.state.currentScreen,
+                currentScreen: disconnectUser ? SCREEN.LOGIN : this.state.currentScreen === SCREEN.GAME ? SCREEN.LOBBY : this.state.currentScreen,
             }); 
-            this.props.socket.emit("quit");
+            this.props.socket.emit("quit", disconnectUser);
         }  
     }
 
     render(){
+        const screen = !this.state.username ? SCREEN.LOGIN : this.state.currentScreen;
         const menuClassName = CreateClassName({
-            hidden: this.state.currentScreen === SCREEN.LOGIN
+            hidden: screen === SCREEN.LOGIN
         });
         const loginClassName = CreateClassName({
-            hidden: this.state.currentScreen !== SCREEN.LOGIN
+            hidden: screen !== SCREEN.LOGIN
         });
         const lobbyClassName = CreateClassName({
-            hidden: this.state.currentScreen !== SCREEN.LOBBY
+            hidden: screen !== SCREEN.LOBBY
         });
         const gameClassName = CreateClassName({
-            hidden: this.state.currentScreen !== SCREEN.GAME
+            hidden: screen !== SCREEN.GAME
         });
         const playersClassName = CreateClassName({
-            hidden: this.state.currentScreen !== SCREEN.PLAYERS
+            hidden: screen !== SCREEN.PLAYERS
         });
 
         return  <div className={"app"}>
@@ -94,7 +106,8 @@ export class App extends Component<AppProps, AppState> {
                         onClick={ currentScreen => this.setState({currentScreen})}
                         currentGame={this.state.currentGame}
                         onQuit={() => this.quit()}
-                        onDisconnect={() => this.quit(true)}/>
+                        onDisconnect={() => this.quit(true)}
+                        onDoubleClick={() => this.props.socket.emit("refresh")}/>
                     <Login className={loginClassName} 
                         onLogin={ username => this.props.socket.emit("login", username) && this.setState({username})}/>
                     <Lobby className={lobbyClassName}

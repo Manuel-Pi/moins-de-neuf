@@ -15,6 +15,7 @@
     max-width: @app-max-width;
     margin: 0 auto;
     z-index: 200;
+    user-select: none;
 
     .logo{
         height: 32px;
@@ -35,12 +36,14 @@
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
+        user-select: none;
     }
     .menu-button{
         color: peru; 
         font-size: 48px;
         padding: 8px;
         cursor: pointer;
+        user-select: none;
     }
 
     .menu{
@@ -50,7 +53,7 @@
         z-index: 300;
         top: 40px;
         display: none;
-        background-color: @color-main-medium-dark;
+        background-color: @color-main;
         padding-bottom: 80px;
         overflow: hidden;
 

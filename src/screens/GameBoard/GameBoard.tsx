@@ -35,7 +35,8 @@ type GameState = {
     startTime: number,
     turn: number,
     round: number,
-    roundStartTime: number
+    roundStartTime: number,
+    cardTurned: boolean
 }
 
 type GameProps = {
@@ -81,7 +82,8 @@ export class GameBoard extends Component<GameProps, GameState> {
             startTime: 0,
             turn: 0,
             round: 0,
-            roundStartTime: 0
+            roundStartTime: 0,
+            cardTurned: false
         }
     }
 
@@ -155,7 +157,8 @@ export class GameBoard extends Component<GameProps, GameState> {
                 hand: [],
                 currentSelection: [],
                 playedCards: [],
-                currentPlayer: null
+                currentPlayer: null,
+                cardTurned: false
             });
         });
     }
@@ -192,7 +195,7 @@ export class GameBoard extends Component<GameProps, GameState> {
             isValid = index !== -1 && ( index === 0 || index === this.state.playedCards[0].length - 1);
         }
         const pickSelection = (isValid && this.state.pickSelection !== cardModel) ? cardModel: null;
-        this.setState({pickSelection});
+        this.setState({pickSelection, cardTurned: true});
         const cardSelection = pickSelection ? CardParser.toJson([pickSelection]) : null;
         !force && this.props.socket.emit("selectPick", cardSelection);
     }
@@ -210,10 +213,11 @@ export class GameBoard extends Component<GameProps, GameState> {
         let previousIndex = this.state.players.indexOf(currentPlayer) - 1;
         previousIndex = previousIndex < 0 ? this.state.players.length - 1 : previousIndex;
         const isLastPlayer = this.state.players[previousIndex].getName() === this.props.username;
+        const isQuickPlay = this.state.quickPlay && isLastPlayer && this.state.currentSelection.length === 1 && this.state.currentSelection[0] === this.state.hand[this.state.hand.length -1];
             
-        if(this.state.isMyTurn || (this.state.quickPlay && isLastPlayer && this.state.turn > 1)){
+        if(this.state.isMyTurn || isQuickPlay){
             const buttons = [];
-            if((this.state.pickSelection && this.state.action === "pick") || (this.state.currentSelection.length && this.state.action === "play")){
+            if((this.state.pickSelection && this.state.action === "pick" && !isQuickPlay) || (this.state.currentSelection.length && this.state.action === "play")){
                 buttons.push(<button className="animate__animated animate__pulse animate__infinite" onClick={() => this.action()}>jouer<FontAwesomeIcon icon="check"/></button>);
             }
             if(this.state.isMyTurn && this.state.lessThanNine && this.state.action === "play"){
@@ -236,7 +240,7 @@ export class GameBoard extends Component<GameProps, GameState> {
                         <Logo/>
                         <h1>
                             <FontAwesomeIcon icon="bullhorn" size="2x"/>
-                            {this.state.results.announcer} 
+                            {this.state.results.announcer}
                         </h1>
                     </div>
                     <h1 className="winners animate__delay-2s animate__animated  animate__jackInTheBox">
@@ -345,14 +349,15 @@ export class GameBoard extends Component<GameProps, GameState> {
                         <Hand   className={"previous-play " + (this.state.action === "pick" ? "is-picking" : "")}
                                 cardModels={this.state.playedCards[0]} 
                                 selectedCardModels={[this.state.pickSelection]} 
-                                onSelected={ cardModel => this.selectPickCard(cardModel)}
-                                turned/>
-
+                                onSelected={ cardModel => this.selectPickCard(cardModel)}/>
                         <Hand   className="played" 
                                 cardModels={this.state.playedCards[1]}/>
                     </div>
                     <div className="playerHand">
-                        <Hand cardModels={this.state.hand} selectedCardModels={this.state.currentSelection} onSelected={ cardModel => this.selectCard(cardModel)}/>
+                        <Hand   cardModels={this.state.hand} 
+                                turned={this.state.cardTurned} 
+                                selectedCardModels={this.state.currentSelection} 
+                                onSelected={ cardModel => this.selectCard(cardModel)}/>
                     </div>
                     {this.state.results && this.displayResults()}
                     {this.state.gameEnd && this.state.displayEnd && this.displayEndGame()}

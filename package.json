@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "webpack --env.production --json > stats.json",
+    "build": "webpack --env.production",
+    "build-stat": "webpack --env.production --json > stats.json",
     "deploy": "npm run build && mkdir -p ../pizi-express-server/apps/moins-de-neuf && rm -f -r ../pizi-express-server/apps/moins-de-neuf/* && cp -R ./dist/* ../pizi-express-server/apps/moins-de-neuf"
   },
   "author": "Manuel-Pi",

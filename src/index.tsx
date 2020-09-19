@@ -35,7 +35,8 @@ import { faCheck,
         faPowerOff,
         faRedo,
         faFlagCheckered,
-        faBan} from '@fortawesome/free-solid-svg-icons';
+        faBan,
+        faComment} from '@fortawesome/free-solid-svg-icons';
 import { App } from "./App";
 // Add custom icon to Font Awesome
 library.add(faCheck, 
@@ -72,12 +73,18 @@ library.add(faCheck,
             faPowerOff,
             faRedo,
             faFlagCheckered,
-            faBan);
+            faBan,
+            faComment);
 // Used for webpack to load less
 !!style;
 !!React;
 // Init Socket,io
-declare const io: any;
+declare global {
+        interface Window { onPiziChat: any, PiziChat: any}
+        const io: any;
+        const PiziChat: any;
+}
 // Get Socket.io
 let socket = io('/pizi-moins-de-neuf');
+if(('standalone' in window.navigator) && (window.navigator['standalone'])) document.documentElement.classList.add("standalone");
 ReactDOM.render(<App socket={socket}/>, document.getElementsByTagName("app")[0]);

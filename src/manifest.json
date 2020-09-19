@@ -1,0 +1,17 @@
+{
+    "short_name": "Moins de Neuf",
+    "name": "Moins de Neuf",
+    "description": "Jeux de carte pour les potos!",
+    "icons": [
+        {
+            "src": "moins-de-neuf.png",
+            "sizes": "160x160",
+            "type": "image/png"
+        }
+    ],
+    "start_url": "./index.html",
+    "display": "standalone",
+    "orientation": "portrait",
+    "theme_color": "B25E18",
+    "background_color": "#222"
+}
