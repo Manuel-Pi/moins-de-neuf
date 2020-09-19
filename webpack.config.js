@@ -61,7 +61,7 @@ module.exports = {
         new CopyPlugin({
             patterns: [
                 "src/index.html",
-                "src/moins-de-neuf.png",
+                "src/icon.png",
                 {
                     from: "src/server",
                     to: "server"
