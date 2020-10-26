@@ -10,7 +10,9 @@ type TabsProps = {
 export const Tabs = ({ className = "", tabs = []}: TabsProps) => {
     const[current, setCurrent] = useState(0);
 
-    return  <div className="tabs">
+
+
+    return  <div className={"tabs " + (tabs.length > 1 ? "" : "solo")}>
                 <div className="titles">
                 {
                     tabs.map((tab, index) => <span className={index === current ? "active" : ""} onClick={ e => setCurrent(index)}>{tab.title}</span>)

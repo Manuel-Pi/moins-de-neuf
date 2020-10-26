@@ -1,0 +1,136 @@
+.stats{
+
+    .user-screen, .users-screen{
+        display: none;
+    }
+
+    &.user{
+        .user-screen{
+            display: block;
+
+            .table{
+                height: 50px;
+            }
+        }
+    }
+
+    &.users{
+        .users-screen{
+            display: block;
+        }
+    }
+
+
+    .content{
+        width: 100%;
+        overflow: auto;
+    }
+    .text-input .placeholder, .password-input .placeholder{
+        color: #444;
+    }
+    
+    canvas{
+        height: calc(100vw ~"-" 8px);
+        width: calc(100vw ~"-" 8px);
+        max-height: calc(500px ~"-" 8px);
+        max-width: calc(500px ~"-" 8px);
+        display: block;
+        margin: 0 auto;
+        margin-bottom: 24px;
+        letter-spacing: 0.4px;
+    }
+
+    .table{
+        letter-spacing: 0.8px;
+
+        th{
+            font-size: 10px;
+            height: auto;
+        }
+        td{
+            font-size: 18px;
+        }
+
+        .body{
+            height: auto;
+        }
+
+        .header{
+            height: 22px;
+            border-bottom: 1px solid #222;
+        }
+    }
+
+    .stat1{
+        display: inline-block;
+        width: 100%;
+        overflow: hidden;
+        letter-spacing: 1px;
+        margin-top: 16px;
+
+        &:nth-child(3){
+            width: 50%;
+            max-width: 150px;
+        }
+
+        &:nth-child(4){
+            width: 50%;
+            max-width: 150px;
+        }
+
+        .placeholder{
+            font-weight: bold;
+            font-size: 16px;
+            color: #222;
+            
+        }
+
+        input{
+            border-bottom: none;
+            font-size: 18px;
+        }
+    }
+
+    .stat-line{
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        align-items: center;
+        margin: 0 auto;
+        max-width: 320px;
+    }
+
+    h1{
+        padding-bottom: 0px !important;
+        position: relative;
+
+        svg{
+            right: 8px;
+            bottom: 12px;
+            position: absolute;
+            font-size: 25px;
+            opacity: 0.8;
+
+            &:nth-child(1){
+                right: 56px;
+                font-size: 22px;
+            }
+
+            &.selected{
+                transform: scale(1.5);
+                opacity: 1;
+            }
+        }
+    }
+
+    h3{
+        margin-top: 0px;
+        text-align: right;
+        width: 100%;
+    }
+
+    h4{
+        margin-bottom: 0px;
+        margin-top: 0px;
+    }
+}

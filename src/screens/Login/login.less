@@ -18,11 +18,24 @@
         }
     }
     
-    .input{
+    .inputs{
         display: flex;
         justify-content: center;
         align-items: center;
-        width: 100%;
+        width: 280px;
+
+        .placeholder{
+            color: #444 !important;
+        }
+
+        .input.empty:not(.focus) .placeholder{
+            font-size: 30px;
+            color: #333 !important;
+        }
+
+        .text-input input, .password-input input{
+            font-size: 30px;
+        }
 
         svg{
             font-size: 34px;
@@ -30,6 +43,22 @@
             cursor: pointer;
             transition: all 0.4s ease;
             color: #222;
+        }
+
+        .password-input{
+            display: none;
+            margin-top: 0 !important;
+        }
+
+        &.user-valid{
+
+            .password-input{
+                display: block;
+            }
+    
+            .text-input{
+                display: none;
+            }
         }
     }
 }

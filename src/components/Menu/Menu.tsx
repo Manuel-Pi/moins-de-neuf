@@ -17,16 +17,36 @@ type MenuProps = {
 export const Menu = ({username, onClick, className = "", currentGame = null, onDisconnect, onQuit, onDoubleClick}:MenuProps) => {
 
     const [open, setOpen] = useState(false);
+    const [closeAnimation, setCloseAnimation] = useState(false);
 
     const menuClassName = CreateClassName({
         "menu": true,
         "active": open,
-        "has-current-game": !!currentGame
+        "has-current-game": !!currentGame,
+        "animate__animated": true,
+        "animate__fadeInRight": open,
+        "animate__fadeOutRight": closeAnimation
     });
 
     const clickHandler = (screen: SCREEN) => {
-        onClick && onClick(screen);
-        setOpen(false);
+        toggle(false);
+
+        onClick(screen);
+    }
+
+    const toggle = (force: boolean, callback?: () => void) => {
+        let toggle = force !== undefined ? force : !open;
+        if(!toggle){
+            setCloseAnimation(true);
+            setTimeout(() => {
+                setOpen(false);
+                callback && callback();
+                setCloseAnimation(false);
+            }, 180);
+        } else {
+            setOpen(true);
+            callback && callback();
+        }
     }
 
     onDisconnect = onDisconnect || (() => null);
@@ -34,15 +54,21 @@ export const Menu = ({username, onClick, className = "", currentGame = null, onD
     return  <div className={"menu-bar " + className} onDoubleClick={ e => onDoubleClick && onDoubleClick()}>
                 <Logo/>
                 <span className="name">{username}</span>
-                <FontAwesomeIcon icon="bars" className="menu-button" onClick={ e => setOpen(!open)}/>
+                <FontAwesomeIcon icon="bars" className="menu-button" onClick={ e => toggle(!open)}/>
                 <div className={menuClassName}>
                     <div className="current-game" >
                         <div className="current-info">
                             <div className="label">Partie en cours</div>
                             <div className="game-name" >{currentGame}</div>
                         </div>
-                        <span onClick={e => {setOpen(false), onQuit && onQuit()}}>Quitter</span>
-                        <span onClick={e => {setOpen(false),clickHandler(SCREEN.GAME)}}>Reprendre</span>
+                        <span onClick={e => onQuit && onQuit()}>
+                            <span>Quitter</span>
+                            <FontAwesomeIcon icon="stop"/>
+                        </span>
+                        <span onClick={e => {clickHandler(SCREEN.GAME)}}>
+                            <span>Reprendre</span>
+                            <FontAwesomeIcon className="animate__animated animate__pulse" icon="play"/>
+                        </span>
                     </div>
                     <div className="general">
                         <div className="menu-lobby" onClick={e => clickHandler(SCREEN.LOBBY)}>
@@ -53,11 +79,11 @@ export const Menu = ({username, onClick, className = "", currentGame = null, onD
                             <FontAwesomeIcon icon="users"/>
                             <span>JOUEURS</span>
                         </div>
-                        <div className={"disabled"} onClick={e => clickHandler(SCREEN.GAME)}>
+                        <div className={""} onClick={e => clickHandler(SCREEN.STATS)}>
                             <FontAwesomeIcon icon="chart-bar"/>
                             <span>STATS</span>
                         </div>
-                        <div className={"disabled"} onClick={e => clickHandler(SCREEN.GAME)}>
+                        <div className={""} onClick={e => clickHandler(SCREEN.ACCOUNT)}>
                             <FontAwesomeIcon icon="user-cog"/>
                             <span>COMPTE</span>
                         </div>

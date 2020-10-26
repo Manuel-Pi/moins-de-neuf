@@ -13,6 +13,7 @@
   "license": "ISC",
   "devDependencies": {
     "@fortawesome/free-brands-svg-icons": "^5.13.0",
+    "@types/chart.js": "^2.9.25",
     "@types/react": "^16.9.34",
     "@types/react-dom": "^16.9.6",
     "copy-webpack-plugin": "^6.0.3",
@@ -36,6 +37,7 @@
     "@fortawesome/react-fontawesome": "^0.1.9",
     "@types/socket.io": "^2.1.4",
     "animate.css": "^4.0.0",
+    "chart.js": "^2.9.3",
     "normalize.css": "^8.0.1",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",

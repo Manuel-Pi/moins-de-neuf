@@ -1,5 +1,4 @@
-import React, { useState, useEffect, CSSProperties } from 'react';
-import {PlayerModel} from './PlayerModel';
+import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 type ScoreProps = {

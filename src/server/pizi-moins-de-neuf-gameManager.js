@@ -1,6 +1,7 @@
 const CardGame = require('./pizi-card-game');
 const mongoose = require('mongoose');
 const GameModel = require('./database/models/game');
+const PlayerModel = require('./database/models/player');
 
 const getGames = (callback) => {
     let games = {};
@@ -18,9 +19,26 @@ const getGames = (callback) => {
     }
 }
 
-const saveGame = (game) => {
+const saveGame = (game, saveStats = false) => {
     if(mongoose.connection.readyState === 1&& game && game.name){
         GameModel.findOneAndUpdate({name: game.name}, game, {upsert: true}, oldValue => {});
+
+        if(game.gameEnd && saveStats){
+            game.players.forEach(player => {
+                // Save Stats
+                PlayerModel.findOne({user: player.name}, (err, model) => {
+                    if(err) console.error(JSON.stringify(err));
+                    if(!model){
+                        model = new PlayerModel({user: player.name});
+                    }
+                    model.updateStats(player.stats);
+                    model.save();
+                });
+            });
+        }
+        if(game.gameEnd){
+            game.gameEnd
+        }
     }
 }
 
@@ -76,6 +94,9 @@ const endRound = (game, callingPlayer) => {
         names:[]
     };
 
+    // Stats - moinsdeneuf
+    
+
     // Get Hand score
     const scores = {};
     game.players.forEach(player => { 
@@ -103,11 +124,14 @@ const endRound = (game, callingPlayer) => {
         const oldScore = player.score;
         const oldStreak = player.scoreStreak;
 
+        if(isCaller) player.stats.moinsdeneuf.call++;
+
         if(isWinner){
             score = 0;
             if(isCaller && game.conf.allowStreak && (!game.conf.onlyOneWinnerStreak || game.conf.onlyOneWinnerStreak && winners.names.length === 1)){
                 player.scoreStreak++;
                 scoreStreak = 1;
+                player.stats.moinsdeneuf.won++;
                 if(player.scoreStreak > 2){
                     player.score = player.score - 50;
                     player.scoreStreak = 0;
@@ -118,7 +142,10 @@ const endRound = (game, callingPlayer) => {
             let jokers = 0;
             while(player.hand[jokers].value === "*") jokers++;
             score = handScore * (jokers + 1);
-            if(isCaller) score = winners.score === score ? score * 2 : score * 3;
+            if(isCaller){
+                score = winners.score === score ? score * 2 : score * 3;
+                player.stats.moinsdeneuf.lost++;
+            } 
             player.score += score;
         }
 
@@ -164,6 +191,20 @@ const endRound = (game, callingPlayer) => {
         game.gameEnd = "time";
     }
 
+    // Stats
+    if(game.gameEnd){
+        game.players.forEach((player,index) => {
+            player.stats.score = player.score;
+            player.stats.games.played++;
+            // Stats - game
+            if(index === 0) {
+                player.stats.games.won++;
+            } else {
+                player.stats.games.lost++;
+            }
+        });
+    }
+
     return {scores, winners, announcer: callingPlayer};
 }
 
@@ -207,6 +248,23 @@ const startGame = (game) => {
         game.players.forEach(p => {
             p.score = 0;
             p.scoreStreak = 0;
+            p.stats = {
+                games: {
+                    played: 0,
+                    won: 0,
+                    lost: 0
+                },
+                moinsdeneuf: {
+                    call: 0,
+                    won: 0,
+                    lost: 0
+                },
+                quickplay:{
+                    done: 0,
+                    taken: 0
+                },
+                score: 0
+            };
         });
         game.gameEnd = null;
         game.round = 0;
@@ -320,6 +378,7 @@ const getPublicGameInfo = (game, gameFinished = false, setTime = false)=> {
             score: player.score,
             scoreStreak: player.scoreStreak,
             ready: player.ready,
+            stats: player.stats,
             hand: []
         }
     });
@@ -484,9 +543,12 @@ module.exports = {
     contains,
     updatePlayer,
     nextAction,
+    nextPlayer,
+    previousPlayer,
     getPublicGames,
     getPublicGameInfo,
     getPublicPlayers,
     checkPlayedCards,
-    removeGame
+    removeGame,
+    getCurrentGameForPlayer
 }

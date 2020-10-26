@@ -42,7 +42,7 @@ export class Players extends Component<PlayersProps, PlayersState> {
     render(){
 
         const className = CreateClassName({
-            "players": true
+            "screen players": true
         }, this.props.className);
 
         return  <div className={className}>

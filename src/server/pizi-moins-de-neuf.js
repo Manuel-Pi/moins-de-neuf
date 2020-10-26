@@ -1,10 +1,11 @@
 const CardManager = require('./pizi-moins-de-neuf-gameManager.js');
 var mongoose = require('mongoose');
+const PlayerModel = require('./database/models/player');
 
-module.exports = function(socketServer){
+module.exports = function(socketServer, console){
     // Get io for a specific namespace
     const io = socketServer.of('/pizi-moins-de-neuf');
- console.log("asdadasdasdasdsa");
+
     // Init state
     let CONNEXION_ON = true;
     let PLAYERS = {};
@@ -18,31 +19,32 @@ module.exports = function(socketServer){
     });
 
     io.on('connection', function (socket) {
+        console.debug("connection of " + socket.id);
 
         /*************** CONNECTIONS *****************/
-        console.log("connection");
-        socket.on('login', username => {
+
+        socket.on('login', (username, token) => {
             if(!username) return;
-            login(socket, username);
+            login(socket, username, token);
         });
 
-        socket.on('reconnectUser', function(username){
+        socket.on('reconnectUser', (username, token) => {
             if(!username) return;
-            login(socket, username);
+            login(socket, username, token);
 
+            // Retrieve current game 
             Object.keys(GAMES).forEach(name => {
                 let g = GAMES[name];
                 g.players.forEach(player => {
                     if(player.name !== username) return;
                     socket.game = g.name;
                     socket.join(g.name);
-                    player.id = socket.id;
                     CardManager.updatePlayer(PLAYERS[socket.player], g);
                     socket.emit('gameInfo', CardManager.getPublicGameInfo(g));
                     socket.emit('setHand', player.hand);
                     CardManager.saveGame(g);
 
-                    // Clear from kixkable players
+                    // Clear from kickable players
                     if(KICKABLE_PLAYERS[username]){
                         clearTimeout(KICKABLE_PLAYERS[username]);
                         delete KICKABLE_PLAYERS[username];
@@ -89,7 +91,23 @@ module.exports = function(socketServer){
                 score: 0,
                 scoreStreak: 0,
                 hand: [],
-                ready: false
+                ready: false,
+                stats: {
+                    games: {
+                        played: 0,
+                        won: 0,
+                        lost: 0
+                    },
+                    moinsdeneuf: {
+                        call: 0,
+                        won: 0,
+                        lost: 0
+                    },
+                    quickplay:{
+                        done: 0,
+                        taken: 0
+                    }
+                }
             });
 
             // Join Room
@@ -255,7 +273,7 @@ module.exports = function(socketServer){
 
             // Check played cards
             if(!CardManager.checkPlayedCards(originalCards)){
-                io.to(game.name).emit('notAllowed');
+                io.to(game.name).emit('notAllowed', player.name);
                 return;
             } 
 
@@ -278,6 +296,12 @@ module.exports = function(socketServer){
                     let lastPlay = game.playedCards[game.playedCards.length - 1];
                     game.playedCards[game.playedCards.length - 1] = lastPlay.concat(originalCards);
                     io.to(game.name).emit('quickPlayed', player.name);
+
+                    // Stats
+                    const p = game.players.filter(player => player.name === game.currentPlayer)[0];
+                    p.stats.quickplay.taken++;
+                    player.stats.quickplay.done++;
+                    
                 } else {
                     CardManager.updatePlayer(player, game);
                     CardManager.nextAction(game);
@@ -299,9 +323,8 @@ module.exports = function(socketServer){
 
             console.debug(player.name + " call for 'moins de neuf' with " + JSON.stringify(player.hand));
 
-            // Is less than nine
             const scores = CardManager.endRound(game, player.name);
-            CardManager.saveGame(game);
+            CardManager.saveGame(game, true);
             console.debug("Scores: " + JSON.stringify(scores));
             if(scores.winners.names.length){
                 io.to(game.name).emit('roundEnd', scores);
@@ -331,14 +354,16 @@ module.exports = function(socketServer){
         return player ? [game, player] : [];
     }
 
-    function login(socket, username){
+    function login(socket, username, token){
         if(!username) return;
+
         PLAYERS[username] = {
             id: socket.id,
             name: username
         };
+        
         socket.player = username;
-        console.info('Connexion of : ' + username);
+        console.info('Connection: ' + username);
         socket.emit('setGames', CardManager.getPublicGames(GAMES));
         socket.emit('setPlayers', CardManager.getPublicPlayers(PLAYERS, GAMES));
     }

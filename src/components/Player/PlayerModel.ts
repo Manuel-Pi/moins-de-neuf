@@ -3,11 +3,12 @@ import { Card } from "../Card/Card";
 
 type PlayerJsonProps = {
     name: string
-    cardNumber: number
-    score: number
-    scoreStreak: number
-    ready: boolean
-    hand: CardJsonProps[]
+    cardNumber?: number
+    score?: number
+    scoreStreak?: number
+    ready?: boolean
+    hand?: CardJsonProps[]
+    stats?: any
 } 
 
 export class PlayerModel{
@@ -20,14 +21,37 @@ export class PlayerModel{
     private scoreStreak:number;
     private ready: boolean;
     private hand: CardModel[];
+    private stats: {
+        games: {
+            won: number,
+            lost: number,
+            played: number,
+            ratio: number
+        },
+        moinsdeneuf: {
+            call: number,
+            won: number,
+            lost: number,
+            ratio: number
+        },
+        quickplay: {
+            done: number,
+            taken: number
+        },
+        score: {
+            min: number,
+            max: number
+        }
+    };
 
-    constructor({name = "no name", cardNumber = 0, score = 0, ready = false, hand = [], scoreStreak = 0}: PlayerJsonProps){
+    constructor({name = "no name", cardNumber = 0, score = 0, ready = false, hand = [], scoreStreak = 0, stats = {}}: PlayerJsonProps){
         this.name = name;
         this.cardNumber = cardNumber;
         this.score = score;
         this.ready = ready;
         this.hand = hand.map(card => new CardModel(card));
         this.scoreStreak = scoreStreak;
+        this.stats = stats;
     }
 
     public getHand(){
@@ -60,5 +84,13 @@ export class PlayerModel{
 
     public getScoreStreak(){
         return this.scoreStreak;
+    }
+
+    public populate(){
+
+    }
+
+    public getStats(){
+        return this.stats;
     }
 }

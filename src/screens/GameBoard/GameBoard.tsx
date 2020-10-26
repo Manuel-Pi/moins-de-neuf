@@ -36,7 +36,8 @@ type GameState = {
     turn: number,
     round: number,
     roundStartTime: number,
-    cardTurned: boolean
+    cardTurned: boolean,
+    modal: any
 }
 
 type GameProps = {
@@ -83,7 +84,8 @@ export class GameBoard extends Component<GameProps, GameState> {
             turn: 0,
             round: 0,
             roundStartTime: 0,
-            cardTurned: false
+            cardTurned: false,
+            modal: null
         }
     }
 
@@ -135,13 +137,15 @@ export class GameBoard extends Component<GameProps, GameState> {
             this.selectPickCard(cardModel, true);
         });
         this.props.socket.on("notAllowed", () => {
-            alert("Pas possible de jouer ça!");
+            this.setState({modal:   <Modal type="alert" onClose={() => this.setState({modal: null})}>
+                                        Pas possible de jouer ça!
+                                    </Modal>});
         });
         this.props.socket.on("quickPlayed", (playerName: string) => {
             this.setState({quickPlayed: playerName});
             setTimeout(e => {
                 this.setState({quickPlayedOut: true});
-                setTimeout(e => {this.setState({quickPlayed: null, quickPlayedOut: false});}, 800);
+                setTimeout(e => {this.setState({quickPlayed: null, quickPlayedOut: false});}, 700);
             }, 1600);
         });
         this.props.socket.on("bash", (playerName: string) => {
@@ -280,15 +284,21 @@ export class GameBoard extends Component<GameProps, GameState> {
     }
 
     displayQuickPlayed(){
-        return  <div className={"quick-played " + (this.state.quickPlayedOut ? "out" : "")}>
-                    <div>{this.state.quickPlayed + " a joué rapidement!"}</div>
-                    <FontAwesomeIcon icon="kiss-wink-heart" size="2x"/>
-                </div>
+        return  <Modal type="info" onClose={() => this.setState({quickPlayed: null, quickPlayedOut: false})} className={"quick-played " + (this.state.quickPlayedOut ? "out" : "")}>
+                    <div>
+                        <span>{this.state.quickPlayed}</span>
+                        <span>a joué rapidement!</span>
+                    </div>
+                    <FontAwesomeIcon className="animate__animated animate__rubberBand" icon="kiss-wink-heart" size="2x"/>
+                </Modal>
     }
 
     displayBash(){
         return  <div className={"quick-played " + (this.state.quickPlayedBashed ? "out" : "")}>
-                    <div>{this.state.quickPlayed + " s'est fait bashé!"}</div>
+                    <div>
+                        <span>{this.state.quickPlayed}</span>
+                        <span>s'est fait bashé!"</span>
+                    </div>
                     <FontAwesomeIcon icon="ban" size="2x"/>
                 </div>
     }
@@ -363,6 +373,7 @@ export class GameBoard extends Component<GameProps, GameState> {
                     {this.state.gameEnd && this.state.displayEnd && this.displayEndGame()}
                     {this.state.quickPlayed && this.displayQuickPlayed()}
                     {this.state.quickPlayedBashed && this.displayBash()}
+                    {this.state.modal}
                 </div>
     }
 }

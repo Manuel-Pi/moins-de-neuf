@@ -31,13 +31,13 @@ const DEFAULT_GAME: GameInfo = {
     maxPlayer: 6,
     allowQuickPlay: true,
     allowStreak: true,
-    onlyOneWinnerStreak: false,
-    allowWinEquality: true,
+    onlyOneWinnerStreak: true,
+    allowWinEquality: false,
     bonusMultiple50: true,
-    playerKickTimeout: "2min",
-    gameKickTimeout: "10min",
+    playerKickTimeout: "5min",
+    gameKickTimeout: "1h",
     gameEndScore: 200,
-    gameEndTime: "30s",
+    gameEndTime: "Jamais",
 }
 
 export class Lobby extends Component<LobbyProps, LobbyState> {
@@ -283,7 +283,7 @@ export class Lobby extends Component<LobbyProps, LobbyState> {
             "disabled": !this.state.gameSelected || this.state.gameSelected !== gameName
         });
 
-        return  <div className={"lobby " + this.props.className}>
+        return  <div className={"screen lobby " + this.props.className}>
                     <h1>Parties</h1>
                     <Table  className="games"
                             header={["Partie", "Joueurs", "Status"]}

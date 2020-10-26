@@ -39,6 +39,10 @@ import { faRedo } from '@fortawesome/free-solid-svg-icons/faRedo';
 import { faFlagCheckered } from '@fortawesome/free-solid-svg-icons/faFlagCheckered';
 import { faComment } from '@fortawesome/free-solid-svg-icons/faComment';
 import { App } from "./App";
+import { faPlay } from "@fortawesome/free-solid-svg-icons/faPlay";
+import { faStop } from "@fortawesome/free-solid-svg-icons/faStop";
+import { faUser } from "@fortawesome/free-solid-svg-icons/faUser";
+import { faUserNinja } from "@fortawesome/free-solid-svg-icons/faUserNinja";
 // Add custom icon to Font Awesome
 library.add(faCheck, 
             faGraduationCap, 
@@ -75,13 +79,17 @@ library.add(faCheck,
             faRedo,
             faFlagCheckered,
             faBan,
-            faComment);
+            faComment,
+            faPlay,
+            faStop,
+            faUser,
+            faUserNinja);
 // Used for webpack to load less
 !!style;
 !!React;
 // Init Socket,io
 declare global {
-        interface Window { onPiziChat: any, PiziChat: any, React: any, ReactDOM: any}
+        interface Window {React: any, ReactDOM: any}
         const io: any;
         const PiziChat: any;
 }

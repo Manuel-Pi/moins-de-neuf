@@ -1,4 +1,5 @@
 .tabs{
+
     .titles{
         display: flex;
         justify-content: flex-start;
@@ -14,6 +15,14 @@
 
             &.active{
                 opacity: 1;
+            }
+        }
+    }
+
+    &.solo{
+        .titles{
+            span.active h2{
+                border-bottom: none;
             }
         }
     }

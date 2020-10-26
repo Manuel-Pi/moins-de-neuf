@@ -6,15 +6,6 @@
     }
 
     .menu{
-        height: calc(100vh ~"-" 40px);
-        width: 100%;
-        position: absolute;
-        z-index: 300;
-        top: 40px;
-        display: none;
-        background-color: @color-main;
-        padding-bottom: 80px;
-        overflow: hidden;
 
         &.has-current-game{
             .current-game{
@@ -23,23 +14,14 @@
         }
 
         .current-game{
-            height: 60px;
-            padding: 16px;
-            width: 100%;
-            background-color:rgba(0,0,0,0.4);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            visibility: hidden;
 
             .current-info{
-                width: 60%;
-                display: inline-block;
-                min-width: 150px;s
+                width: calc(100% ~"-" 80px);
+                min-width: 150px;
 
                 .label{
                     font-size: 14px;
-                    color: @color-main;
+                    color: #333;
                 }
 
                 .game-name{
@@ -48,13 +30,32 @@
             }
 
             span{
-                font-size: 10px;
-                padding: 4px 8px;
+                font-size: 12px;
+                padding: 4px 16px;
+
+                svg{
+                    font-size: 20px;
+                }
+
+                &:nth-child(3) {
+                    font-size: 20px;
+                    padding-right: 0px;
+                    padding-left: 8px;
+
+                    svg{
+                        font-size: 30px;
+                    }
+                }
+
+                span{
+                    display: none;
+                }
             }
         }
 
         .general{
             width: 100%;
+            max-width: 380px;
 
             > div{
                 height: 100px;
@@ -65,7 +66,6 @@
                 }
     
                 span{
-                    font-size: 16px;
                     padding: 8px;
                 }
             }
