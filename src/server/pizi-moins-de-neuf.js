@@ -375,7 +375,16 @@ module.exports = function(socketServer, console){
     let botPlaying = false;
     function playForBot(game, socket){
         if(botPlaying || game.endGame) return;
-        let currentPlayer = game.players.filter(player => player.name === game.currentPlayer)[0];
+        let currentPlayer;
+        let onePlayerHaveLessThan3Cards = false;
+        game.players.forEach(player => {
+            if(!currentPlayer && player.name === game.currentPlayer){
+                currentPlayer = player;
+            } else if(!onePlayerHaveLessThan3Cards && player.hand.length < 4){
+                onePlayerHaveLessThan3Cards = true;
+            }
+        });
+
         if(currentPlayer && currentPlayer.bot){
             botPlaying = true;
             console.debug(currentPlayer.name + " hand: " + JSON.stringify(currentPlayer.hand));
@@ -448,6 +457,8 @@ module.exports = function(socketServer, console){
                     let lastPlayedCards = game.playedCards[game.playedCards.length - 1];
                     const lastPlayValues = lastPlayedCards.map(c => CardGame.getValue(c));
 
+                    const jokers = hand.filter(card => card.color === "joker");
+
                     // Check same card values 
                     const sameValue = {};
                     for(let i = 0; i < hand.length - 1; i++){
@@ -469,6 +480,7 @@ module.exports = function(socketServer, console){
                     });
                     if(highestValue && !lastPlayValues.includes(highestValue)){
                         cards = hand.filter(card => CardGame.getValue(card) === highestValue);
+                        if(cards.length && jokers.length) while(jokers.length) cards.splice(1, 0, jokers.shift());
                     }
 
                     // If no cards selected take highest
@@ -478,6 +490,7 @@ module.exports = function(socketServer, console){
                             cards.push(card);
                             return;
                         }
+                        if(onePlayerHaveLessThan3Cards && jokers.length) while(jokers.length) cards.push(jokers.shift());
                     });
 
                      // Set hand

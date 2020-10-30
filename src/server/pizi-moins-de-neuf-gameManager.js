@@ -116,7 +116,7 @@ const createGame = (games, gameData = {name}, force = false) => {
         gameEnd: null
     };
 
-    let botNames = ["Manu", "Fab", "Fresh", "Lucas", "Margeu", "Zaza", "Cé", "Nazim", "JC"];
+    let botNames = ["Manu", "Fab", "Fresh", "Lucas", "Margeu", "Zaza", "Cé", "Nazim", "JC", "Digo"];
     function getRandomName(){
         const randomElement = Math.floor(Math.random() * botNames.length);
         return botNames.splice(randomElement, 1)[0];
