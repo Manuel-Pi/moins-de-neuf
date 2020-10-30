@@ -78,6 +78,9 @@ PlayerSchema.methods.updateStats = function(stats){
 
     if(stats.score < this.stats.score.min) this.stats.score.min = stats.score;
     if(stats.score > this.stats.score.max) this.stats.score.max = stats.score;
+
+    // First time
+    if(this.stats.score.max && this.stats.games.played === 1) this.stats.score.min = this.stats.score.max;
 }
 
 const getRatio = (value, max) => {

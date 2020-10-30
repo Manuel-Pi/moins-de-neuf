@@ -29,6 +29,7 @@ const DEFAULT_GAME: GameInfo = {
     name: "",
     minPlayer: 3,
     maxPlayer: 6,
+    bots: 0,
     allowQuickPlay: true,
     allowStreak: true,
     onlyOneWinnerStreak: true,
@@ -37,7 +38,7 @@ const DEFAULT_GAME: GameInfo = {
     playerKickTimeout: "5min",
     gameKickTimeout: "1h",
     gameEndScore: 200,
-    gameEndTime: "Jamais",
+    gameEndTime: "Jamais"
 }
 
 export class Lobby extends Component<LobbyProps, LobbyState> {
@@ -144,6 +145,17 @@ export class Lobby extends Component<LobbyProps, LobbyState> {
                                     gameData: {
                                         ...this.state.gameData,
                                         maxPlayer
+                                    }
+                                })}/>
+                <NumberInput    className={inputClassName}
+                                placeholder="Bots"
+                                min={0}
+                                max={this.state.gameData.maxPlayer - 1}
+                                initialValue={this.state.gameData.bots}
+                                onChange={bots => this.setState({
+                                    gameData: {
+                                        ...this.state.gameData,
+                                        bots
                                     }
                                 })}/>
                 <NumberInput    className={inputClassName}

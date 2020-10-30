@@ -36,9 +36,9 @@ export class Stats extends Component<StatsProps, StatsState> {
         this.chart = new Chart(ctx, {
             type: 'radar',
             data: {
-                labels: ['Victoire', 'Style', 'Stratégie', 'Régularité', 'Réactivité'],
+                labels: ['Victoire', 'Style', 'Strategie', 'Regularite', 'Reactivite'],
                 datasets: [{
-                    data: [2, 4, 3, 5, 1],
+                    data: [0, 0, 0, 0, 0],
                     label: "",
                     backgroundColor: "rgba(26, 163, 255, 0.3)",
                     borderColor: 'rgba(0, 138, 230, 1)',
@@ -85,21 +85,48 @@ export class Stats extends Component<StatsProps, StatsState> {
         Rest.get("/players").then(json => {
             if(json.message || !(json instanceof Array)) return;
             const players = json.map((player: any) => new PlayerModel({stats: player.stats, name: player.user}));
+            players.sort((p1, p2) => p2.getStats().games.won - p1.getStats().games.won);
             this.setState({
                 currentPlayer: players.filter(p => p.getName() === this.props.username)[0],
                 players,
                 currentScreen: this.state.currentPlayer ? "user" : "users"
             }, () => {
-                if(!this.state.currentPlayer) return;
-                const victoire = this.state.currentPlayer.getStats().games.won * 6 / this.state.currentPlayer.getStats().games.won;
-                const chance = 4;
-                const rapidité = this.state.currentPlayer.getStats().moinsdeneuf.ratio * 6 / 100;
-                const régularité = this.state.currentPlayer.getStats().games.ratio * 6 / 100;
-                const réactivité = (this.state.currentPlayer.getStats().quickplay.done - this.state.currentPlayer.getStats().quickplay.taken) * 6 / (this.state.currentPlayer.getStats().quickplay.done - this.state.currentPlayer.getStats().quickplay.taken);
-                this.chart.data.datasets[0].data = [victoire, chance, rapidité, régularité, réactivité];
+                this.chart.data.datasets[0].data = this.getChartData();
                 this.chart.update();
             });
         });
+    }
+
+
+    getChartData(){
+        if(!this.state.currentPlayer) return [0,0,0,0,0];
+
+        let victoireMax = 0;
+        let rapiditeMax = 0;
+        let regulariteMax = 0;
+        let reactiviteMax = 0;
+        let victoireMin = 0;
+        let rapiditeMin = 0;
+        let regulariteMin = 0;
+        let reactiviteMin = 0;
+        this.state.players.forEach(player => {
+            victoireMax = Math.max(victoireMax, player.getStats().games.won);
+            rapiditeMax = Math.max(rapiditeMax, player.getStats().moinsdeneuf.ratio);
+            regulariteMax = Math.max(regulariteMax, player.getStats().games.ratio);
+            reactiviteMax = Math.max(reactiviteMax, (player.getStats().quickplay.done - player.getStats().quickplay.taken));
+
+            victoireMin = Math.min(victoireMin, player.getStats().games.won);
+            rapiditeMin = Math.min(rapiditeMin, player.getStats().moinsdeneuf.ratio);
+            regulariteMin = Math.min(regulariteMin, player.getStats().games.ratio);
+            reactiviteMin = Math.min(reactiviteMin, (player.getStats().quickplay.done - player.getStats().quickplay.taken));
+        });
+
+        const victoire = this.state.currentPlayer.getStats().games.won * 6 / victoireMax;
+        const style = 4;
+        const rapidite = this.state.currentPlayer.getStats().moinsdeneuf.ratio * 6 / (rapiditeMax - rapiditeMin);
+        const regularite = this.state.currentPlayer.getStats().games.ratio * 6 / (regulariteMax - regulariteMin);
+        const reactivite = Math.max(this.state.currentPlayer.getStats().quickplay.done - this.state.currentPlayer.getStats().quickplay.taken, 0) * 6 / (reactiviteMax - reactiviteMin);
+        return [victoire, style, rapidite, regularite, reactivite];
     }
 
     getUserScreen(){
@@ -130,15 +157,15 @@ export class Stats extends Component<StatsProps, StatsState> {
                     <div className="stat-line">
                         <div className="stat1">
                             <h4>Parties</h4>
-                            <Table header={["Jouée", "Gagnée", "Perdue", "Ratio"]} body={[[stats.games.played, stats.games.won, stats.games.lost, stats.games.ratio + "%"]]}/>
+                            <Table header={["Jouee", "Gagnee", "Perdue", "Ratio"]} body={[[stats.games.played, stats.games.won, stats.games.lost, stats.games.ratio + "%"]]}/>
                         </div>
                         <div className="stat1">
                             <h4>Moins de neuf</h4>
-                            <Table header={["Annoncé", "Gagné", "Perdu", "Ratio"]} body={[[stats.moinsdeneuf.call, stats.moinsdeneuf.won, stats.moinsdeneuf.lost, stats.moinsdeneuf.ratio + "%" ]]}/>
+                            <Table header={["Annonce", "Gagne", "Perdu", "Ratio"]} body={[[stats.moinsdeneuf.call, stats.moinsdeneuf.won, stats.moinsdeneuf.lost, stats.moinsdeneuf.ratio + "%" ]]}/>
                         </div>
                         <div className="stat1">
                             <h4>Jeu rapide</h4>
-                            <Table header={["Réussi", "Pris"]} body={[[stats.quickplay.done, stats.quickplay.taken]]}/>
+                            <Table header={["Reussi", "Pris"]} body={[[stats.quickplay.done, stats.quickplay.taken]]}/>
                         </div>
                         <div className="stat1">
                             <h4>Score</h4>
@@ -160,8 +187,8 @@ export class Stats extends Component<StatsProps, StatsState> {
 
     getUsersScreen(){
         return  <div className="content users-screen">
-                    <Table  header={["Joueur", "Parties gagnées", "Parties jouées", "Parties perdues"]} 
-                            body={this.state.players.sort((p1, p2) => p1.getStats().games.won - p2.getStats().games.won).map(player => [
+                    <Table  header={["Joueur", "Parties gagnees", "Parties jouees", "Parties perdues"]} 
+                            body={this.state.players.map(player => [
                                 player.getName(), 
                                 player.getStats().games.won, 
                                 player.getStats().games.played,
@@ -192,7 +219,7 @@ export class Stats extends Component<StatsProps, StatsState> {
 /* 
 
 Victoire: game.won
-Régularité: game.ratio
-Réactivité: quickPlay.done - quickPlay.taken
-Rapidité: temps
+Regularite: game.ratio
+Reactivite: quickPlay.done - quickPlay.taken
+Rapidite: temps
 */

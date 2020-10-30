@@ -16,6 +16,7 @@ export type GameInfo = {
     name: string,
     minPlayer: number,
     maxPlayer: number,
+    bots: number,
     allowQuickPlay: boolean,
     allowStreak: boolean,
     allowWinEquality: boolean,

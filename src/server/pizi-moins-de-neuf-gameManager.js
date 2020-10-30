@@ -3,6 +3,35 @@ const mongoose = require('mongoose');
 const GameModel = require('./database/models/game');
 const PlayerModel = require('./database/models/player');
 
+const addPlayer = (player, game) => {
+
+    if(!player || !game) return;
+
+    game.players.push({
+        ...player,
+        score: 0,
+        scoreStreak: 0,
+        hand: [],
+        ready: player.ready || false,
+        stats: {
+            games: {
+                played: 0,
+                won: 0,
+                lost: 0
+            },
+            moinsdeneuf: {
+                call: 0,
+                won: 0,
+                lost: 0
+            },
+            quickplay:{
+                done: 0,
+                taken: 0
+            }
+        }
+    });
+}
+
 const getGames = (callback) => {
     let games = {};
     if(mongoose.connection.readyState === 1){
@@ -71,7 +100,7 @@ const createGame = (games, gameData = {name}, force = false) => {
     gameEndScore: 200
     */
 
-    return games[gameData.name] = {
+    const game = games[gameData.name] = {
         lastTime: (new Date()).getTime(),
         name: gameData.name,
         authorized: gameData.authorized,
@@ -85,7 +114,19 @@ const createGame = (games, gameData = {name}, force = false) => {
         quikPlay: false,
         conf: gameData,
         gameEnd: null
+    };
+
+    let botNames = ["Manu", "Fab", "Fresh", "Lucas", "Margeu", "Zaza", "Cé", "Nazim", "JC"];
+    function getRandomName(){
+        const randomElement = Math.floor(Math.random() * botNames.length);
+        return botNames.splice(randomElement, 1)[0];
     }
+
+    if(gameData.bots){
+        for(let i = 0; i < gameData.bots; i++) addPlayer({name: "Bot-" + getRandomName(), bot: true, ready: true}, game);
+    }
+
+    return game;
 }
 
 const endRound = (game, callingPlayer) => {
@@ -159,7 +200,7 @@ const endRound = (game, callingPlayer) => {
             hand: player.hand
         };
 
-        player.ready = false;
+        player.ready = player.bot || false;
         player.hand = [];
     });
 
@@ -550,5 +591,6 @@ module.exports = {
     getPublicPlayers,
     checkPlayedCards,
     removeGame,
-    getCurrentGameForPlayer
+    getCurrentGameForPlayer,
+    addPlayer
 }
