@@ -1,10 +1,12 @@
 const CardManager = require('./pizi-moins-de-neuf-gameManager.js');
 const CardGame = require('./pizi-card-game');
-var mongoose = require('mongoose');
+const mongoose = require('mongoose');
+const ioClient = require('socket.io-client');
 
-module.exports = function(socketServer, console){
+module.exports = function(socketServer, console, url){
     // Get io for a specific namespace
     const io = socketServer.of('/pizi-moins-de-neuf');
+    const ioClientChat = ioClient(url + '/pizi-chat/moinsdeneuf');
 
     // Init state
     let CONNEXION_ON = true;
@@ -15,7 +17,17 @@ module.exports = function(socketServer, console){
 
     // Init game from DB
     mongoose.connection.once('open', () => {
-        CardManager.getGames( games => GAMES = games);
+        CardManager.getGames( games => {
+            GAMES = games;
+            Object.values(GAMES).forEach(game => {
+                ioClientChat.emit("addRoom", {
+                    id: game.name,
+                    name: "[game] " + game.name,
+                    private: true,
+                    allowedUsers: game.players.map(player => player.name)
+                })
+            })
+        });
     });
 
     io.on('connection', function (socket) {
@@ -95,6 +107,12 @@ module.exports = function(socketServer, console){
             socket.join(gameName);
             CardManager.saveGame(game);
 
+            // Update chat room
+            ioClientChat.emit("updateRoom", {
+                id: game.name,
+                allowedUsers: game.players.map(player => player.name)
+            })
+
             // Clean players
             let i = game.players.length;
             while(i--){
@@ -135,6 +153,17 @@ module.exports = function(socketServer, console){
                 console.info('Game created: ' + gameProps.name);
                 socket.emit('gameCreated');
             }
+
+            ioClientChat.emit("addRoom", {
+                id: gameProps.name,
+                name: "[game] " + gameProps.name,
+                private: true
+            });
+
+        });
+
+        ioClientChat.on('roomAdded', room => {
+            if(room.id.includes("[game]")) {}
         });
 
         socket.on('removeGame', gameName => {

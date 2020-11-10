@@ -81,10 +81,11 @@ export class App extends Component<AppProps, AppState> {
         });
 
         this.props.socket.on("gameInfo", (game:any) => {
-           if(this.state.username && !game) this.setState({
+            if(this.state.username && !game) this.setState({
                 currentScreen: SCREEN.LOBBY
             });
-        });
+            this.state.piziChat.join(game.name);
+        }); 
     }
 
     quit(disconnectUser = false, callback?: () => void){
@@ -99,6 +100,7 @@ export class App extends Component<AppProps, AppState> {
                                                 localStorage.removeItem("username");
                                                 localStorage.removeItem("token");
                                             }
+                                            this.state.piziChat.leave(this.state.currentGame);
                                             this.setState({
                                                 username: disconnectUser ? null : this.state.username,
                                                 currentGame: null,
@@ -144,6 +146,7 @@ export class App extends Component<AppProps, AppState> {
                         onDisconnect={() => this.quit(true)}
                         onDoubleClick={() => this.props.socket.emit("refresh")}/>
                     <Lobby className={lobbyClassName}
+                        chat={this.state.piziChat}
                         socket={this.props.socket} 
                         onGameSelected={ gameName => this.setState({currentGame: gameName, currentScreen: !this.state.currentGame ? SCREEN.GAME : this.state.currentScreen})}/>
                     <GameBoard  className={gameClassName}

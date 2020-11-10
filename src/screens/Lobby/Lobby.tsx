@@ -23,6 +23,7 @@ type LobbyProps = {
     className: string
     socket: any
     onGameSelected: (gameName:string) => void
+    chat: any
 }
 
 const DEFAULT_GAME: GameInfo = {
@@ -75,6 +76,7 @@ export class Lobby extends Component<LobbyProps, LobbyState> {
         this.setState({gameSelected: null});
         this.props.socket.emit("quit");
         this.props.onGameSelected(null);
+        this.props.chat.leave(this.state.gameSelected);
     }
 
     join(){

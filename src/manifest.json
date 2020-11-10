@@ -13,5 +13,14 @@
     "display": "standalone",
     "orientation": "portrait",
     "theme_color": "B25E18",
-    "background_color": "#222"
+    "background_color": "#222",
+    "default_locale": "fr",
+    "permissions": {
+        "audio-capture" : {
+            "description" : "Audio capture"
+        },
+        "speech-recognition" : {
+            "description" : "Speech recognition"
+        }
+    }
 }
