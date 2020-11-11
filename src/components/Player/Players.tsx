@@ -5,11 +5,12 @@ import { Score } from './Score';
 
 type PlayersProps = {
     playerModels: PlayerModel[]
+    spectatorModels: PlayerModel[]
     className?: string
     currentPlayer: string
 }
 
-export const Players = ({ playerModels, className = "", currentPlayer}: PlayersProps) => {
+export const Players = ({ playerModels = [], className = "", currentPlayer, spectatorModels = []}: PlayersProps) => {
     return  <div className={"players-info"}>
                 <table>
                     <tbody>
@@ -35,7 +36,23 @@ export const Players = ({ playerModels, className = "", currentPlayer}: PlayersP
                                     <Score score={playerModel.getScore()} scoreStreak={playerModel.getScoreStreak()}/>
                                 </td>
                             </tr>)
-                    }
+                        }
+                        {
+                            spectatorModels.map(playerModel => 
+                                <tr className={"player spectator " + className + (currentPlayer === playerModel.getName() ? " current" : "")}>
+                                    <td>
+                                    </td>
+                                    <td className="icon">
+                                        {<FontAwesomeIcon icon="user-secret" />}
+                                    </td>
+                                    <td className="name">
+                                        {playerModel.getName()}
+                                    </td>
+                                    <td className="score-td">
+                                        ?
+                                    </td>
+                                </tr>)    
+                        }
                     </tbody>
                 </table>
             </div>

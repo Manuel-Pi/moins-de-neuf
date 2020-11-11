@@ -9,6 +9,7 @@ type PlayerJsonProps = {
     ready?: boolean
     hand?: CardJsonProps[]
     stats?: any
+    bot?: boolean
 } 
 
 export class PlayerModel{
@@ -21,6 +22,7 @@ export class PlayerModel{
     private scoreStreak:number;
     private ready: boolean;
     private hand: CardModel[];
+    private bot: boolean;
     private stats: {
         games: {
             won: number,
@@ -44,7 +46,7 @@ export class PlayerModel{
         }
     };
 
-    constructor({name = "no name", cardNumber = 0, score = 0, ready = false, hand = [], scoreStreak = 0, stats = {}}: PlayerJsonProps){
+    constructor({name = "no name", cardNumber = 0, score = 0, ready = false, hand = [], scoreStreak = 0, stats = {}, bot = false}: PlayerJsonProps){
         this.name = name;
         this.cardNumber = cardNumber;
         this.score = score;
@@ -52,6 +54,7 @@ export class PlayerModel{
         this.hand = hand.map(card => new CardModel(card));
         this.scoreStreak = scoreStreak;
         this.stats = stats;
+        this.bot = bot;
     }
 
     public getHand(){
@@ -86,8 +89,8 @@ export class PlayerModel{
         return this.scoreStreak;
     }
 
-    public populate(){
-
+    public isBot(){
+        return this.bot;
     }
 
     public getStats(){

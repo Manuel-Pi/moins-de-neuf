@@ -49,11 +49,19 @@ export const Menu = ({username, onClick, className = "", currentGame = null, onD
         }
     }
 
+    const gameDisplayed = currentGame && !open;
+
     onDisconnect = onDisconnect || (() => null);
 
     return  <div className={"menu-bar " + className} onDoubleClick={ e => onDoubleClick && onDoubleClick()}>
                 <Logo/>
-                <span className="name">{username}</span>
+                <div className="title">
+                    {!gameDisplayed && <FontAwesomeIcon icon={gameDisplayed ? "play" : "user"}/>}
+                    <div>
+                        <span>{gameDisplayed ? "partie" : "user"}</span>
+                        <div>{currentGame ? currentGame : username}</div>
+                    </div>
+                </div>
                 <FontAwesomeIcon icon="bars" className="menu-button" onClick={ e => toggle(!open)}/>
                 <div className={menuClassName}>
                     <div className="current-game" >

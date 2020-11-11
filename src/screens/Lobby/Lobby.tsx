@@ -17,6 +17,7 @@ type LobbyState = {
     currentGame: string
     gameInfo: string
     gameData: GameInfo
+    modal: any
 }
 
 type LobbyProps = {
@@ -51,7 +52,8 @@ export class Lobby extends Component<LobbyProps, LobbyState> {
             gameSelected: null,
             currentGame: null,
             gameInfo: null,
-            gameData: null
+            gameData: null,
+            modal: null
         }
     }
 
@@ -80,7 +82,21 @@ export class Lobby extends Component<LobbyProps, LobbyState> {
     }
 
     join(){
-        this.props.socket.emit("join", this.state.gameSelected);
+        let currentGameModel = this.state.games.filter(game => game.getName() === this.state.gameSelected)[0];
+        if(currentGameModel && currentGameModel.getAction()){
+        this.setState({modal: <Modal type="confirm" onClose={() => this.setState({modal: null})}
+                                        onConfirm={() => {
+                                            this.props.socket.emit("join", this.state.gameSelected);
+                                            this.setState({modal: null})
+                                        }}>
+                                            <h3>Partie en cours!</h3>
+                                            <p>Vous pouvez rejoindre en tant que spectateur.</p>
+                                            <p>Une fois la manche terminée vous pourrez rejoindre la partie.</p>
+                                            <p className="detail">(Votre score initial sera égal à la moyenne des scores des autres joueurs)</p>
+                                        </Modal>})
+        } else {
+            this.props.socket.emit("join", this.state.gameSelected);
+        }
     }
 
     remove(){
@@ -271,7 +287,8 @@ export class Lobby extends Component<LobbyProps, LobbyState> {
     }
 
     render(){
-        const isStarted = this.state.gameSelected && !!this.state.games.filter(game => game.getName() === this.state.gameSelected)[0].getAction();
+        const gameSelected = this.state.games.filter(game => game.getName() === this.state.gameSelected)[0];
+        const isStarted = this.state.gameSelected && !!gameSelected.getAction();
         const gameName = this.state.currentGame || "";
 
         const createClassName = CreateClassName({
@@ -280,21 +297,17 @@ export class Lobby extends Component<LobbyProps, LobbyState> {
 
         const joinClassName = CreateClassName({
             "join": true,
-            "disabled": !this.state.gameSelected || (this.state.gameSelected === gameName) || isStarted || (this.state.gameSelected && this.state.gameSelected === gameName)
+            "disabled": !gameSelected || gameSelected.getName() === gameName || gameSelected.isFull() 
         });
 
         const deleteClassName = CreateClassName({
             "remove": true,
-            "disabled": !this.state.gameSelected || this.state.games.reduce((acc, game) => {
-                if(acc && game.getName() === this.state.gameSelected && !game.getPlayerModels().length){
-                    return false;
-                }
-            }, true)
+            "disabled": !gameSelected || gameSelected.getTotalPlayers(false) > 0
         });
 
         const quitClassName = CreateClassName({
             "quit": true,
-            "disabled": !this.state.gameSelected || this.state.gameSelected !== gameName
+            "disabled": !gameSelected || gameSelected.getName() !== gameName
         });
 
         return  <div className={"screen lobby " + this.props.className}>
@@ -309,12 +322,13 @@ export class Lobby extends Component<LobbyProps, LobbyState> {
                             actions={[
                                 <FontAwesomeIcon icon="plus" className={createClassName} onClick={e => this.create()}/>,
                                 <FontAwesomeIcon icon="minus" className={deleteClassName} onClick={e => this.remove()}/>,
-                                <FontAwesomeIcon icon="info" className={deleteClassName} onClick={e => this.info()}/>,
+                                <FontAwesomeIcon icon="info" className={"info"} onClick={e => this.info()}/>,
                                 <FontAwesomeIcon icon="sign-out-alt" className={quitClassName} onClick={e => this.quit()}/>,
                                 <FontAwesomeIcon icon="sign-in-alt" className={joinClassName} onClick={e => this.join()}/>
                             ]}
                             onSelect={selected => this.setState({gameSelected: selected && selected[0]})}/>
                         {this.gameInfo()}
+                        {this.state.modal}
                 </div>
     }
 }

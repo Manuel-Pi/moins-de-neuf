@@ -84,7 +84,7 @@ export class App extends Component<AppProps, AppState> {
             if(this.state.username && !game) this.setState({
                 currentScreen: SCREEN.LOBBY
             });
-            this.state.piziChat.join(game.name);
+            if(game) this.state.piziChat.join(game.name);
         }); 
     }
 
@@ -141,7 +141,7 @@ export class App extends Component<AppProps, AppState> {
                     <Menu className={menuClassName} 
                         username={this.state.username} 
                         onClick={ currentScreen => this.setState({currentScreen})}
-                        currentGame={this.state.currentGame}
+                        currentGame={this.state.currentScreen === SCREEN.GAME && this.state.currentGame}
                         onQuit={() => this.quit()}
                         onDisconnect={() => this.quit(true)}
                         onDoubleClick={() => this.props.socket.emit("refresh")}/>

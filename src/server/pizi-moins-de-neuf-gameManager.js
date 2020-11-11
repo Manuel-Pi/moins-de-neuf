@@ -4,12 +4,13 @@ const GameModel = require('./database/models/game');
 const PlayerModel = require('./database/models/player');
 
 const addPlayer = (player, game) => {
-
     if(!player || !game) return;
+
+    const startScore = game.round ? Math.round(game.players.reduce((total, player) => total + player.score, 0) / game.players.length): 0;
 
     game.players.push({
         ...player,
-        score: 0,
+        score: startScore,
         scoreStreak: 0,
         hand: [],
         ready: player.ready || false,
@@ -30,6 +31,14 @@ const addPlayer = (player, game) => {
             }
         }
     });
+}
+
+const addSpectator = (player, game) => {
+    if(!player || !game) return;
+
+    game.spectators = game.spectators || [];
+    if(game.spectators.filter(spectator => spectator.name === player.name).length) return;
+    game.spectators.push(player);
 }
 
 const getGames = (callback) => {
@@ -105,6 +114,7 @@ const createGame = (games, gameData = {name}, force = false) => {
         name: gameData.name,
         authorized: gameData.authorized,
         players: [],
+        spectators: [],
         playedCards: [],
         pickStack: CardGame.generateCards(),
         currentPlayer: null,
@@ -245,6 +255,9 @@ const endRound = (game, callingPlayer) => {
             }
         });
     }
+
+    if(game.spectators) game.spectators.forEach(spectator => addPlayer(spectator, game));
+    game.spectators = [];
 
     return {scores, winners, announcer: callingPlayer};
 }
@@ -403,7 +416,8 @@ const getPublicGames = (games) => {
             name,
             players: gameInfo.players,
             action: gameInfo.action,
-            conf: gameInfo.conf
+            conf: gameInfo.conf,
+            spectators: gameInfo.spectators || []
         }
     })
 }
@@ -420,6 +434,7 @@ const getPublicGameInfo = (game, gameFinished = false, setTime = false)=> {
             scoreStreak: player.scoreStreak,
             ready: player.ready,
             stats: player.stats,
+            bot: player.bot || false,
             hand: []
         }
     });
@@ -446,7 +461,8 @@ const getPublicGameInfo = (game, gameFinished = false, setTime = false)=> {
         startTime: game.startTime,
         turn: game.turn,
         roundStartTime: game.roundStartTime,
-        round: game.round
+        round: game.round,
+        spectators: game.spectators || []
     }
 };
 
@@ -592,5 +608,6 @@ module.exports = {
     checkPlayedCards,
     removeGame,
     getCurrentGameForPlayer,
-    addPlayer
+    addPlayer,
+    addSpectator
 }

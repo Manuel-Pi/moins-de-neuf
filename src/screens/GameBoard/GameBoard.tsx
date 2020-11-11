@@ -37,7 +37,8 @@ type GameState = {
     round: number,
     roundStartTime: number,
     cardTurned: boolean,
-    modal: any
+    modal: any,
+    spectators: PlayerModel[]
 }
 
 type GameProps = {
@@ -85,7 +86,8 @@ export class GameBoard extends Component<GameProps, GameState> {
             round: 0,
             roundStartTime: 0,
             cardTurned: false,
-            modal: null
+            modal: null,
+            spectators: []
         }
     }
 
@@ -102,7 +104,7 @@ export class GameBoard extends Component<GameProps, GameState> {
                 lessThanNine: hand.reduce((sum, card) => sum + card.getIntValue(), 0) < 10
             });
         });
-        this.props.socket.on("gameInfo", (gameInfo:{name: string, players: any[], playedCards: any[], currentPlayer: string, action: string, quickPlay: boolean, gameEnd: null, startTime: number, turn: number, round: number, roundStartTime: number}) => {
+        this.props.socket.on("gameInfo", (gameInfo:{name: string, players: any[], spectators: any[], playedCards: any[], currentPlayer: string, action: string, quickPlay: boolean, gameEnd: null, startTime: number, turn: number, round: number, roundStartTime: number}) => {
             if(!gameInfo) return;
             this.setState({
                 menuActive: false,
@@ -117,7 +119,8 @@ export class GameBoard extends Component<GameProps, GameState> {
                 startTime: gameInfo.startTime,
                 turn: gameInfo.turn,
                 round: gameInfo.round,
-                roundStartTime: gameInfo.roundStartTime
+                roundStartTime: gameInfo.roundStartTime,
+                spectators: gameInfo.spectators.map(player => new PlayerModel(player))
             });
         });
         this.props.socket.on("selectedPick", (card: any) => {
@@ -349,7 +352,7 @@ export class GameBoard extends Component<GameProps, GameState> {
                             <Card   cardModel={this.pickCard} 
                                     className={"pick " + (this.state.pickSelection === this.pickCard ? "selected" : "")}
                                     onClick={() => this.state.action === "pick" && this.state.isMyTurn && this.selectPickCard(this.pickCard)}/>
-                            <Players playerModels={this.state.players} currentPlayer={this.state.currentPlayer}/>
+                            <Players playerModels={this.state.players} spectatorModels={this.state.spectators} currentPlayer={this.state.currentPlayer}/>
                         </div>
                         <div className={actionClassName}>
                             {this.getAction()}

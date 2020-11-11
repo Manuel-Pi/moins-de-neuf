@@ -8,6 +8,7 @@ type GameJsonProps = {
     name: string
     cards: any[]
     players: any[]
+    spectators: any[]
     quickPlay: boolean
     conf: GameInfo
 }
@@ -34,6 +35,7 @@ export class GameModel{
     private name: string;
     private playedCards: CardModel[] = [];
     private playerModels: PlayerModel[] = [];
+    private spectatorModels: PlayerModel[] = [];
     private quickPlay: boolean;
     private turn: number = 0;
     private conf: GameInfo = null;
@@ -46,6 +48,7 @@ export class GameModel{
         this.playerModels = props.players ? props.players.map(player => new PlayerModel(player)): [];
         this.quickPlay = props.quickPlay;
         this.conf = props.conf;
+        this.spectatorModels = props.spectators ? props.spectators.map(player => new PlayerModel(player)): [];
     }
 
     public getAction() {
@@ -72,8 +75,20 @@ export class GameModel{
         return this.playerModels;
     }
 
+    public getSpectatorModels() {
+        return this.spectatorModels;
+    }
+
     public getPlayedCards() {
         return this.playedCards;
+    }
+
+    public getTotalPlayers(countBot = true) {
+        return this.spectatorModels.length + this.playerModels.filter(player => !player.isBot() || (countBot && player.isBot())).length 
+    }
+
+    public isFull(){
+        return this.getTotalPlayers() >= this.conf.maxPlayer
     }
     
 }

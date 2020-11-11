@@ -24,7 +24,7 @@ module.exports = function(socketServer, console, url){
                     id: game.name,
                     name: "[game] " + game.name,
                     private: true,
-                    allowedUsers: game.players.map(player => player.name)
+                    allowedUsers: game.players.filter(player => !player.bot).map(player => player.name)
                 })
             })
         });
@@ -93,7 +93,8 @@ module.exports = function(socketServer, console, url){
         socket.on('join', gameName => {
             let game = GAMES[gameName];
             let player = PLAYERS[socket.player];
-            if(!game || !player || game.action || game.players.length > 7 || game.players.length > game.conf.maxPlayer) return;
+            const totalConnected = game.players.length + (game.spectators ? game.spectators.length : 0);
+            if(!game || !player || totalConnected > 7 || totalConnected >= game.conf.maxPlayer) return;
 
             // If player already in game, kick before allowing him to join again
             if(socket.game && GAMES[socket.game] && CardManager.updatePlayer(player, GAMES[socket.game])){
@@ -101,7 +102,8 @@ module.exports = function(socketServer, console, url){
             }
 
             socket.game = gameName;
-            CardManager.addPlayer(player, game);
+            game.spectators = game.spectators || [];
+            !game.action ? CardManager.addPlayer(player, game) : CardManager.addSpectator(player, game);
 
             // Join Room
             socket.join(gameName);
@@ -110,7 +112,7 @@ module.exports = function(socketServer, console, url){
             // Update chat room
             ioClientChat.emit("updateRoom", {
                 id: game.name,
-                allowedUsers: game.players.map(player => player.name)
+                allowedUsers: [...game.players.filter(p => !p.bot).map(player => player.name)]
             })
 
             // Clean players
