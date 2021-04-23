@@ -84,7 +84,7 @@ export class GameModel{
     }
 
     public getTotalPlayers(countBot = true) {
-        return this.spectatorModels.length + this.playerModels.filter(player => !player.isBot() || (countBot && player.isBot())).length 
+        return this.playerModels.filter(player => !player.isBot() || (countBot && player.isBot())).length 
     }
 
     public isFull(){

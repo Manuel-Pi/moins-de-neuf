@@ -141,8 +141,9 @@ export class App extends Component<AppProps, AppState> {
                     <Menu className={menuClassName} 
                         username={this.state.username} 
                         onClick={ currentScreen => this.setState({currentScreen})}
-                        currentGame={this.state.currentScreen === SCREEN.GAME && this.state.currentGame}
-                        onQuit={() => this.quit()}
+                        currentGame={this.state.currentGame}
+                        currentScreen={this.state.currentScreen}
+                        onQuit={(closeModal) => this.quit(false, closeModal)}
                         onDisconnect={() => this.quit(true)}
                         onDoubleClick={() => this.props.socket.emit("refresh")}/>
                     <Lobby className={lobbyClassName}

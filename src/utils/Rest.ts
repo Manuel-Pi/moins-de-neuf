@@ -6,7 +6,7 @@ const basicRequest = (url: string, options: any = {}) => {
     if(authToken) options.headers = new Headers({...options.headers, Authorization: authToken});
     let fullUrl = "/pizi-rest/" + url;
     if(options.query) fullUrl += "?" + new URLSearchParams(options.query).toString();
-    return fetch(fullUrl, options).then(response => response.json());
+    return fetch(fullUrl, options).then(response => response && response.json()).catch(error => console.error(error));
 }
 
 export const Rest = {
@@ -24,16 +24,17 @@ export const Rest = {
         return this.post("token", null, {
             headers: {login, password}
         }).then((token: any) => {
-            if(token.jwt){
+            if(token && token.jwt){
                 TOKEN = token;
                 localStorage.setItem("token", JSON.stringify(TOKEN))
             }
             return token
-        })
+        }).catch((error:any) => console.error(error))
     },
     checkToken(){
         TOKEN = TOKEN || JSON.parse(localStorage.getItem("token")) || null;
         return this.post("check").then((response:any) => {
+            if(!response) return;
             if(response.message){
                 this.clearToken();
             } else {

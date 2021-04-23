@@ -31,6 +31,9 @@ const addPlayer = (player, game) => {
             }
         }
     });
+
+    game.lastTime = (new Date()).getTime();
+
 }
 
 const addSpectator = (player, game) => {
@@ -348,6 +351,9 @@ const kickPlayer = (player, game, games) => {
     if(game.currentPlayer === player.name) game.currentPlayer = index + 1 < game.players.length ? game.players[index + 1].name : 0;
     if(index !== -1) game.players.splice(index, 1);
 
+    const specIndex = game.spectators.indexOf(player);
+    if(specIndex !== -1) game.spectators.splice(specIndex, 1);
+
     if(game.players.length === 0 && games) createGame(games, game.conf, true);
 }
 
@@ -394,6 +400,7 @@ const nextAction = (game)=> {
         default:
             game.action = "play";
     }
+    game.lastTime = (new Date()).getTime();
 }
 
 const getPublicGames = (games) => {
@@ -406,7 +413,6 @@ const getPublicGames = (games) => {
             removeGame(game);
             console.info('Delete game: ' + game.name + ' after ' + Math.round(((new Date()).getTime() - game.lastTime) / 1000) + "s");
             delete games[Object.keys(games)[i]];
-            
         }
     } 
 
@@ -609,5 +615,6 @@ module.exports = {
     removeGame,
     getCurrentGameForPlayer,
     addPlayer,
-    addSpectator
+    addSpectator,
+    valueToMillisecond
 }

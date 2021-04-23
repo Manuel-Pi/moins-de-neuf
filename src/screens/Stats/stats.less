@@ -89,6 +89,10 @@
             border-bottom: none;
             font-size: 18px;
         }
+
+        + .stat1{
+            margin-top: 24px;
+        }
     }
 
     .stat-line{
@@ -103,17 +107,23 @@
     h1{
         padding-bottom: 0px !important;
         position: relative;
+    }
+
+    .options{
+        display: inline-flex;
+        justify-content: space-between;
+        align-items: center;
+        width: 70px;
+        margin-top: 16px;
+        float: right;
 
         svg{
-            right: 8px;
-            bottom: 12px;
-            position: absolute;
-            font-size: 25px;
-            opacity: 0.8;
+            font-size: 22px;
+            opacity: 0.7;
+            cursor: pointer;
 
-            &:nth-child(1){
-                right: 56px;
-                font-size: 22px;
+            &:nth-child(2){
+                font-size: 25px;
             }
 
             &.selected{
@@ -123,10 +133,21 @@
         }
     }
 
-    h3{
+    h2.title{
         margin-top: 0px;
-        text-align: right;
+        text-align: center;
         width: 100%;
+        margin-top: 24px;
+        margin-bottom: 32px;
+
+        svg{
+            font-size: 32px;
+            margin-right: 8px;
+
+            &.fa-user{
+                font-size: 28px;
+            }
+        }
     }
 
     h4{

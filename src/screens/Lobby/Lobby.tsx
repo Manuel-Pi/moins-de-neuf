@@ -302,7 +302,7 @@ export class Lobby extends Component<LobbyProps, LobbyState> {
 
         const deleteClassName = CreateClassName({
             "remove": true,
-            "disabled": !gameSelected || gameSelected.getTotalPlayers(false) > 0
+            "disabled": !gameSelected || (gameSelected.getTotalPlayers(false) + gameSelected.getSpectatorModels().length) > 0
         });
 
         const quitClassName = CreateClassName({

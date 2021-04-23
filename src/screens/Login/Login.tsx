@@ -22,7 +22,7 @@ export const Login = ({ onLogin = e => null, className, socket}:LoginProps) => {
 
     const login = () => {
         Rest.getToken(inputValue, passwordValue).then((token:any) => {
-            if(!token.exist){
+            if(!token || !token.exist){
                 onLogin(inputValue, token);
             } else {
                 setUserValid(true);

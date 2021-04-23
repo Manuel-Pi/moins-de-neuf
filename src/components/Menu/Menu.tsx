@@ -10,11 +10,12 @@ type MenuProps = {
     onClick?: (data:any) => void
     onDoubleClick?: () => void
     currentGame: string
+    currentScreen: SCREEN
     onDisconnect: () => void
-    onQuit: () => void
+    onQuit: (closeMenu: () => void) => void
 }
 
-export const Menu = ({username, onClick, className = "", currentGame = null, onDisconnect, onQuit, onDoubleClick}:MenuProps) => {
+export const Menu = ({username, onClick, className = "", currentGame = null, currentScreen = null, onDisconnect, onQuit, onDoubleClick}:MenuProps) => {
 
     const [open, setOpen] = useState(false);
     const [closeAnimation, setCloseAnimation] = useState(false);
@@ -30,7 +31,6 @@ export const Menu = ({username, onClick, className = "", currentGame = null, onD
 
     const clickHandler = (screen: SCREEN) => {
         toggle(false);
-
         onClick(screen);
     }
 
@@ -49,7 +49,12 @@ export const Menu = ({username, onClick, className = "", currentGame = null, onD
         }
     }
 
-    const gameDisplayed = currentGame && !open;
+    const quitWrapper = () => {
+        if(!onQuit) return;
+        onQuit(() => toggle(false));
+    };
+
+    const gameDisplayed = currentScreen === SCREEN.GAME && !open;
 
     onDisconnect = onDisconnect || (() => null);
 
@@ -59,7 +64,7 @@ export const Menu = ({username, onClick, className = "", currentGame = null, onD
                     {!gameDisplayed && <FontAwesomeIcon icon={gameDisplayed ? "play" : "user"}/>}
                     <div>
                         <span>{gameDisplayed ? "partie" : "user"}</span>
-                        <div>{currentGame ? currentGame : username}</div>
+                        <div>{gameDisplayed ? currentGame : username}</div>
                     </div>
                 </div>
                 <FontAwesomeIcon icon="bars" className="menu-button" onClick={ e => toggle(!open)}/>
@@ -69,7 +74,7 @@ export const Menu = ({username, onClick, className = "", currentGame = null, onD
                             <div className="label">Partie en cours</div>
                             <div className="game-name" >{currentGame}</div>
                         </div>
-                        <span onClick={e => onQuit && onQuit()}>
+                        <span onClick={e => quitWrapper()}>
                             <span>Quitter</span>
                             <FontAwesomeIcon icon="stop"/>
                         </span>

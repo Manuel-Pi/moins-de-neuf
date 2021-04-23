@@ -55,20 +55,13 @@ module.exports = function(socketServer, console, url){
                     socket.emit('gameInfo', CardManager.getPublicGameInfo(g));
                     socket.emit('setHand', player.hand);
                     CardManager.saveGame(g);
+                    console.info(username + ' successfully reconnected!');
 
                     // Play for bot
                     playForBot(g, socket);
-
-                    // Clear from kickable players
-                    if(KICKABLE_PLAYERS[username]){
-                        clearTimeout(KICKABLE_PLAYERS[username]);
-                        delete KICKABLE_PLAYERS[username];
-                        console.info(username + ' removed from timeouts!');
-                    }
-
-                    console.info(username + ' successfully reconnected!');
                 });
             });
+
             socket.emit('setGames', CardManager.getPublicGames(GAMES));
             socket.emit('setPlayers', CardManager.getPublicPlayers(PLAYERS, GAMES));            
          });
@@ -78,14 +71,14 @@ module.exports = function(socketServer, console, url){
             let [game, player] = getGameAndPlayer(socket);
             if(!player) return;
 
-            if(game.conf.playerKickTimeout !== "Jamais") KICKABLE_PLAYERS[player.name] = setTimeout( () => {
+            if(game.conf.playerKickTimeout !== "Jamais" && !KICKABLE_PLAYERS[player.name]) KICKABLE_PLAYERS[player.name] = setTimeout( () => {
                 CardManager.kickPlayer(player, game, GAMES);
                 CardManager.saveGame(game);
                 io.to(game.name).emit('gameInfo', CardManager.getPublicGameInfo(game));
                 io.emit('setGames', CardManager.getPublicGames(GAMES));
                 io.emit('setPlayers', CardManager.getPublicPlayers(PLAYERS, GAMES));
                 socket.leave(game.name);
-            }, valueToMillisecond(game.conf.playerKickTimeout), this);
+            }, CardManager.valueToMillisecond(game.conf.playerKickTimeout), this);
         });
 
         /******************* JOIN / QUIT GAME **********************/
@@ -105,9 +98,12 @@ module.exports = function(socketServer, console, url){
             game.spectators = game.spectators || [];
             !game.action ? CardManager.addPlayer(player, game) : CardManager.addSpectator(player, game);
 
+            if(game.action) playForBot(game, socket);
+
             // Join Room
             socket.join(gameName);
             CardManager.saveGame(game);
+            cleanPlayerFromTimeout(player.name);
 
             // Update chat room
             ioClientChat.emit("updateRoom", {
@@ -120,7 +116,7 @@ module.exports = function(socketServer, console, url){
             while(i--){
                 if(!game.players[i].bot && !io.sockets[game.players[i].id]){
                     CardManager.kickPlayer(game.players[i], GAMES[socket.game], GAMES);
-                    console.info("Kick " + game.players[i].name);
+                    console.info("Clean player " + game.players[i].name);
                     return;
                 }
             }
@@ -192,6 +188,8 @@ module.exports = function(socketServer, console, url){
                 if(player.ready) readyCount++;
                 allReady = allReady && player.ready
             });
+
+            cleanPlayerFromTimeout(player.name);
   
             if(allReady && game.conf.minPlayer <= readyCount){
                 CardManager.startGame(game);
@@ -266,6 +264,7 @@ module.exports = function(socketServer, console, url){
             console.debug(player.name + " pick " + JSON.stringify(card));
             CardManager.updatePlayer(player, game);
             CardManager.nextAction(game);
+            cleanPlayerFromTimeout(player.name);
 
             // For Front-End
             game.quickPlay = !!CardManager.quickPlay(player, [card], game);
@@ -294,6 +293,8 @@ module.exports = function(socketServer, console, url){
                 io.to(game.name).emit('notAllowed', player.name);
                 return;
             } 
+
+            cleanPlayerFromTimeout(player.name);
 
             // If validation succeed, set hand
             player.hand = player.hand.filter(userCard => {
@@ -384,28 +385,25 @@ module.exports = function(socketServer, console, url){
         console.info('Connection: ' + username);
         socket.emit('setGames', CardManager.getPublicGames(GAMES));
         socket.emit('setPlayers', CardManager.getPublicPlayers(PLAYERS, GAMES));
+
+        cleanPlayerFromTimeout(username);
     }
 
-    function valueToMillisecond(value){
-        switch(value){
-            case "30s":
-                return 30 * 1000;
-            case "1min":
-                return 60 * 1000;
-            case "2min":
-                return 2 * 60 * 1000;
-            case "5min":
-                return 5 * 60 * 1000;
-            case "10min":
-                return 10 * 60 * 1000;
-            case "30min":
-                return 30 * 60 * 1000;
+    function cleanPlayerFromTimeout(username){
+        // Clear from kickable players
+        if(KICKABLE_PLAYERS[username]){
+            clearTimeout(KICKABLE_PLAYERS[username]);
+            delete KICKABLE_PLAYERS[username];
+            console.info(username + ' removed from timeouts!');
         }
     }
 
     let botPlaying = false;
     function playForBot(game, socket){
         if(botPlaying || game.endGame) return;
+        game.spectators = game.spectators || [];
+        if((game.players.length + game.spectators.length) <= game.conf.bots) return;
+
         let currentPlayer;
         let onePlayerHaveLessThan3Cards = false;
         game.players.forEach(player => {

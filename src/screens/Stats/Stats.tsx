@@ -87,7 +87,7 @@ export class Stats extends Component<StatsProps, StatsState> {
             const players = json.map((player: any) => new PlayerModel({stats: player.stats, name: player.user}));
             players.sort((p1, p2) => p2.getStats().games.won - p1.getStats().games.won);
             this.setState({
-                currentPlayer: players.filter(p => p.getName() === this.props.username)[0],
+                currentPlayer: players.filter(p => p.getName() === this.props.username)[0] || players[0],
                 players,
                 currentScreen: this.state.currentPlayer ? "user" : "users"
             }, () => {
@@ -121,12 +121,14 @@ export class Stats extends Component<StatsProps, StatsState> {
             reactiviteMin = Math.min(reactiviteMin, (player.getStats().quickplay.done - player.getStats().quickplay.taken));
         });
 
+        reactiviteMin = Math.max(0, reactiviteMin);
+
         const victoire = this.state.currentPlayer.getStats().games.won * 6 / victoireMax;
         const style = 4;
         const rapidite = this.state.currentPlayer.getStats().moinsdeneuf.ratio * 6 / (rapiditeMax - rapiditeMin);
         const regularite = this.state.currentPlayer.getStats().games.ratio * 6 / (regulariteMax - regulariteMin);
         const reactivite = Math.max(this.state.currentPlayer.getStats().quickplay.done - this.state.currentPlayer.getStats().quickplay.taken, 0) * 6 / (reactiviteMax - reactiviteMin);
-        return [victoire, style, rapidite, regularite, reactivite];
+        return [Math.max(victoire, 0.5), Math.max(style, 0.5), Math.max(rapidite, 0.5), Math.max(regularite, 0.5), Math.max(reactivite, 0.5)];
     }
 
     getUserScreen(){
@@ -157,15 +159,15 @@ export class Stats extends Component<StatsProps, StatsState> {
                     <div className="stat-line">
                         <div className="stat1">
                             <h4>Parties</h4>
-                            <Table header={["Jouee", "Gagnee", "Perdue", "Ratio"]} body={[[stats.games.played, stats.games.won, stats.games.lost, stats.games.ratio + "%"]]}/>
+                            <Table header={["Jouées", "Gagnées", "Perdues", "Ratio"]} body={[[stats.games.played, stats.games.won, stats.games.lost, stats.games.ratio + "%"]]}/>
                         </div>
                         <div className="stat1">
                             <h4>Moins de neuf</h4>
-                            <Table header={["Annonce", "Gagne", "Perdu", "Ratio"]} body={[[stats.moinsdeneuf.call, stats.moinsdeneuf.won, stats.moinsdeneuf.lost, stats.moinsdeneuf.ratio + "%" ]]}/>
+                            <Table header={["Annoncés", "Gagnés", "Perdus", "Ratio"]} body={[[stats.moinsdeneuf.call, stats.moinsdeneuf.won, stats.moinsdeneuf.lost, stats.moinsdeneuf.ratio + "%" ]]}/>
                         </div>
                         <div className="stat1">
                             <h4>Jeu rapide</h4>
-                            <Table header={["Reussi", "Pris"]} body={[[stats.quickplay.done, stats.quickplay.taken]]}/>
+                            <Table header={["Réussis", "Pris"]} body={[[stats.quickplay.done, stats.quickplay.taken]]}/>
                         </div>
                         <div className="stat1">
                             <h4>Score</h4>
@@ -187,13 +189,24 @@ export class Stats extends Component<StatsProps, StatsState> {
 
     getUsersScreen(){
         return  <div className="content users-screen">
-                    <Table  header={["Joueur", "Parties gagnees", "Parties jouees", "Parties perdues"]} 
+                    <Table  header={["Joueur", "Parties gagnées", "Parties jouées", "Parties perdues"]} 
                             body={this.state.players.map(player => [
                                 player.getName(), 
                                 player.getStats().games.won, 
                                 player.getStats().games.played,
                                 player.getStats().games.lost
-                            ])}></Table>
+                            ])}
+                            selectable
+                            onSelect={player => {
+                                        if(!player) return;
+                                        this.setState({
+                                            currentPlayer: this.state.players.filter(p => p.getName() === player[0])[0],
+                                            currentScreen: "user"
+                                        }, () => {
+                                            this.chart.data.datasets[0].data = this.getChartData();
+                                            this.chart.update();
+                                        })
+                                    }}></Table>
                 </div>
     }
 
@@ -205,11 +218,15 @@ export class Stats extends Component<StatsProps, StatsState> {
         }, this.props.className);
 
         return  <div className={className}>
-                    <h1>
-                        Stats
-                        <FontAwesomeIcon className={this.state.currentScreen === "user" ? "selected" : ""} icon="user" onClick={() => this.setState({currentScreen: 'user'})}/>
-                        <FontAwesomeIcon className={this.state.currentScreen === "users" ? "selected" : ""} icon="users" onClick={() => this.setState({currentScreen: 'users'})}/>
+                    <h1>Stats 
+                        <div className="options">
+                            <FontAwesomeIcon className={this.state.currentScreen === "users" ? "selected" : ""} icon="list-ol" onClick={() => this.setState({currentScreen: 'users'})}/>
+                            <FontAwesomeIcon className={this.state.currentScreen === "user" ? "selected" : ""} icon="chart-bar" onClick={() => this.setState({currentScreen: 'user'})}/>
+                        </div>
                     </h1>
+                    <h2 className="title">
+                        {this.state.currentScreen === "users" ? <><FontAwesomeIcon icon="users"/>Classement</> : <><FontAwesomeIcon icon="user"/>{this.state.currentPlayer && this.state.currentPlayer.getName()}</>}
+                    </h2>
                     {this.getUserScreen()}
                     {this.getUsersScreen()}
                 </div>
