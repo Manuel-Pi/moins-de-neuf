@@ -1,23 +1,18 @@
 import React, {Component } from 'react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { CreateClassName } from '../../utils/Utils';
-import { GameModel, GameInfo } from '../GameBoard/GameModel';
-import { Table } from '../../components/Table/Table';
-import { Modal } from '../../components/Modal/Modal';
-import { TextInput } from '../../components/Input/TextInput';
-import { NumberInput } from '../../components/Input/NumberInput';
-import { CheckBox } from '../../components/Input/CheckBox';
-import { ListInput } from '../../components/Input/ListInput';
-import { Tabs } from '../../components/Tabs/Tabs';
-import { Score } from '../../components/Player/Score';
+import { GameModel } from '../GameBoard/GameModel';
+import { Modal as OldModal} from '../../components/Modal/Modal';
+import {Table, Heading, Modal} from 'pizi-react';
+import { ButtonGroup } from 'pizi-react/src/components/ButtonGroup/ButtonGroup';
+import { Button } from 'pizi-react/src/components/Button/Button';
+import { GameModal } from '../GameModal/GameModal';
 
 type LobbyState = {
     games: GameModel[]
-    gameSelected: string
-    currentGame: string
-    gameInfo: string
-    gameData: GameInfo
-    modal: any
+    gameSelected: GameModel
+    currentGame: GameModel
+    gameInfo: "create" | "info"
+    displayGameInfo: boolean
+    warningGameStarted: boolean
 }
 
 type LobbyProps = {
@@ -25,22 +20,6 @@ type LobbyProps = {
     socket: any
     onGameSelected: (gameName:string) => void
     chat: any
-}
-
-const DEFAULT_GAME: GameInfo = {
-    name: "",
-    minPlayer: 3,
-    maxPlayer: 6,
-    bots: 0,
-    allowQuickPlay: true,
-    allowStreak: true,
-    onlyOneWinnerStreak: true,
-    allowWinEquality: false,
-    bonusMultiple50: true,
-    playerKickTimeout: "5min",
-    gameKickTimeout: "1h",
-    gameEndScore: 200,
-    gameEndTime: "Jamais"
 }
 
 export class Lobby extends Component<LobbyProps, LobbyState> {
@@ -52,26 +31,24 @@ export class Lobby extends Component<LobbyProps, LobbyState> {
             gameSelected: null,
             currentGame: null,
             gameInfo: null,
-            gameData: null,
-            modal: null
+            displayGameInfo: false,
+            warningGameStarted: null
         }
     }
 
     componentDidMount(){
         // Connection accepted
-        this.props.socket.on("setGames", (games:any) => {
-            this.setState({
-                games: games.map((game: any) => new GameModel(game)),
-            });
-        });
+        this.props.socket.on("setGames", (games:any) => this.setState({
+            games: games.map((game: any) => new GameModel(game)),
+        }))
 
         // Game joined
         this.props.socket.on("gameInfo", (game:any) => {
-            this.setState({currentGame: game ? game.name : null});
+            this.setState({currentGame: game ? new GameModel(game) : null});
             this.props.onGameSelected(game ? game.name : null);
-        });
+        })
 
-        this.props.socket.on("gameCreated", (game:any) => this.setState({gameData: null}));       
+        this.props.socket.on("gameCreated", (game:any) =>  this.setState({displayGameInfo: false}))  
     }
 
     quit(){
@@ -82,253 +59,64 @@ export class Lobby extends Component<LobbyProps, LobbyState> {
     }
 
     join(){
-        let currentGameModel = this.state.games.filter(game => game.getName() === this.state.gameSelected)[0];
-        if(currentGameModel && currentGameModel.getAction()){
-        this.setState({modal: <Modal type="confirm" onClose={() => this.setState({modal: null})}
-                                        onConfirm={() => {
-                                            this.props.socket.emit("join", this.state.gameSelected);
-                                            this.setState({modal: null})
-                                        }}>
-                                            <h3>Partie en cours!</h3>
-                                            <p>Vous pouvez rejoindre en tant que spectateur.</p>
-                                            <p>Une fois la manche terminée vous pourrez rejoindre la partie.</p>
-                                            <p className="detail">(Votre score initial sera égal à la moyenne des scores des autres joueurs)</p>
-                                        </Modal>})
+        if(this.state.gameSelected && this.state.gameSelected.getAction()){
+            this.setState({warningGameStarted: true})
         } else {
-            this.props.socket.emit("join", this.state.gameSelected);
+            this.props.socket.emit("join", this.state.gameSelected.getName());
         }
     }
 
     remove(){
+        this.props.socket.emit("removeGame", this.state.gameSelected.getName());
         this.setState({gameSelected: null});
-        this.props.socket.emit("removeGame", this.state.gameSelected);
-    }
-
-    create(){
-        //const name = prompt("Name ?");
-        this.setState({gameInfo: "create", gameData: DEFAULT_GAME});
-        //this.props.socket.emit("createGame", {name});
-    }
-
-    info(){
-        for(let i = 0; i < this.state.games.length; i++){
-            if(this.state.games[i].getName() === this.state.gameSelected){
-                this.setState({gameInfo: "info", gameData: this.state.games[i].getConf()});
-                break;
-            }
-        }  
-    }
-
-    gameInfo(){
-        if(!this.state.gameData) return null;
-        const createButtonClassName = CreateClassName({
-            disabled: !this.state.gameData.name
-        });
-        const inputClassName = CreateClassName({
-            disabled: this.state.gameInfo !== "create"
-        });
-        let currentGameModel = this.state.games.filter(game => game.getName() === this.state.gameSelected)[0];
-
-        let tabs = [];
-
-        tabs.push({
-            title: <h2>{this.state.gameInfo === "create" ? "Nouvelle Partie" : "Infos"}</h2>,
-            content: <>
-                <TextInput  className={inputClassName}
-                            initialValue={this.state.gameData.name}
-                            placeholder="Nom"
-                            onChange={name => this.setState({
-                                gameData: {
-                                    ...this.state.gameData,
-                                    name
-                                }
-                            })}/>
-                <NumberInput    className={inputClassName}
-                                placeholder="Joueurs minimum"
-                                min={1}
-                                max={7}
-                                initialValue={this.state.gameData.minPlayer}
-                                onChange={minPlayer => this.setState({
-                                    gameData: {
-                                        ...this.state.gameData,
-                                        minPlayer
-                                    }
-                                })}/>
-                <NumberInput    className={inputClassName}
-                                placeholder="Joueurs maximum"
-                                min={1}
-                                max={7}
-                                initialValue={this.state.gameData.maxPlayer}
-                                onChange={maxPlayer => this.setState({
-                                    gameData: {
-                                        ...this.state.gameData,
-                                        maxPlayer
-                                    }
-                                })}/>
-                <NumberInput    className={inputClassName}
-                                placeholder="Bots"
-                                min={0}
-                                max={this.state.gameData.maxPlayer - 1}
-                                initialValue={this.state.gameData.bots}
-                                onChange={bots => this.setState({
-                                    gameData: {
-                                        ...this.state.gameData,
-                                        bots
-                                    }
-                                })}/>
-                <NumberInput    className={inputClassName}
-                                placeholder="Score de fin de partie"
-                                min={-100}
-                                max={1000}
-                                step={50}
-                                initialValue={this.state.gameData.gameEndScore}
-                                onChange={gameEndScore => this.setState({
-                                    gameData: {
-                                        ...this.state.gameData,
-                                        gameEndScore
-                                    }
-                                })}/>
-                <ListInput  className={inputClassName}
-                            placeholder="Finir la partie après:"
-                            initialValue={this.state.gameData.gameEndTime}
-                            values={["30s", "10min", "15min", "20min", "30min", "45min", "1h", "Jamais"]}
-                            onChange={gameEndTime => this.setState({
-                                gameData: {
-                                    ...this.state.gameData,
-                                    gameEndTime
-                                }
-                            })}/>
-                <CheckBox   className={inputClassName}
-                            placeholder="Jeux rapide"
-                            initialValue={this.state.gameData.allowQuickPlay}
-                            onChange={allowQuickPlay => this.setState({
-                                gameData: {
-                                    ...this.state.gameData,
-                                    allowQuickPlay
-                                }
-                            })}/>
-                <CheckBox   className={inputClassName}
-                            placeholder="Avec étoiles"
-                            initialValue={this.state.gameData.allowStreak}
-                            onChange={allowStreak => this.setState({
-                                gameData: {
-                                    ...this.state.gameData,
-                                    allowStreak
-                                }
-                            })}/>
-                <CheckBox   className={inputClassName}
-                            placeholder="Étoile seulement si 1 gagnant"
-                            initialValue={this.state.gameData.onlyOneWinnerStreak}
-                            onChange={onlyOneWinnerStreak => this.setState({
-                                gameData: {
-                                    ...this.state.gameData,
-                                    onlyOneWinnerStreak
-                                }
-                            })}/>
-                <CheckBox   className={inputClassName}
-                            placeholder="-50 sur les multiple de 50"
-                            initialValue={this.state.gameData.bonusMultiple50}
-                            onChange={bonusMultiple50 => this.setState({
-                                gameData: {
-                                    ...this.state.gameData,
-                                    bonusMultiple50
-                                }
-                            })}/>
-                <CheckBox   className={inputClassName}
-                            placeholder="Autoriser égalité"
-                            initialValue={this.state.gameData.allowWinEquality}
-                            onChange={allowWinEquality => this.setState({
-                                gameData: {
-                                    ...this.state.gameData,
-                                    allowWinEquality
-                                }
-                            })}/>
-                <ListInput  className={inputClassName}
-                            placeholder="Déconnecter joueur si inactif après:"
-                            initialValue={this.state.gameData.playerKickTimeout}
-                            values={["30s", "1min", "2min", "5min", "10min", "30min", "Jamais"]}
-                            onChange={playerKickTimeout => this.setState({
-                                gameData: {
-                                    ...this.state.gameData,
-                                    playerKickTimeout
-                                }
-                            })}/>
-                <ListInput  className={inputClassName}
-                            placeholder="Supprimer partie si inactive après:"
-                            initialValue={this.state.gameData.gameKickTimeout}
-                            values={["2min", "5min", "10min", "30min", "Jamais"]}
-                            onChange={gameKickTimeout => this.setState({
-                                gameData: {
-                                    ...this.state.gameData,
-                                    gameKickTimeout
-                                }
-                            })}/>
-                {this.state.gameInfo === "create" ? <div className="create">
-                    <span className={createButtonClassName} onClick={e => this.props.socket.emit("createGame", this.state.gameData)}>
-                        Créer
-                    </span>
-                </div>: null}
-            </>
-        });
-
-        if(currentGameModel && this.state.gameInfo !== "create"){
-            tabs.push({
-                title: <h2>Joueurs</h2>,
-                content: <Table className={"players-info"}
-                                header={["#", "Pseudo", "Score"]} 
-                                body={currentGameModel.getPlayerModels().map((player, index) => [index + 1, player.getName(), <Score score={player.getScore()} scoreStreak={player.getScoreStreak()}/>])}/>
-    
-            });
-        }
-
-        return  <Modal onClose={() => this.setState({gameData: null})}>
-                    <Tabs tabs={tabs}/>
-                </Modal>
     }
 
     render(){
-        const gameSelected = this.state.games.filter(game => game.getName() === this.state.gameSelected)[0];
-        const isStarted = this.state.gameSelected && !!gameSelected.getAction();
-        const gameName = this.state.currentGame || "";
-
-        const createClassName = CreateClassName({
-            "create": true,
-        });
-
-        const joinClassName = CreateClassName({
-            "join": true,
-            "disabled": !gameSelected || gameSelected.getName() === gameName || gameSelected.isFull() 
-        });
-
-        const deleteClassName = CreateClassName({
-            "remove": true,
-            "disabled": !gameSelected || (gameSelected.getTotalPlayers(false) + gameSelected.getSpectatorModels().length) > 0
-        });
-
-        const quitClassName = CreateClassName({
-            "quit": true,
-            "disabled": !gameSelected || gameSelected.getName() !== gameName
-        });
-
         return  <div className={"screen lobby " + this.props.className}>
-                    <h1>Parties</h1>
-                    <Table  className="games"
+                    <Heading tag="h1" appearance="simple" color="secondary">Parties</Heading>
+                    <Table  appearance="simple" 
+                            color="secondary"
                             header={["Partie", "Joueurs", "Status"]}
-                            body={this.state.games.map(game => [
+                            data={this.state.games.map(game => [
                                 game.getName(),
                                 game.getPlayerModels().length + "/" + game.getConf().maxPlayer,
                                 game.getAction() ? "En cours" : "En attente"
                             ])}
-                            actions={[
-                                <FontAwesomeIcon icon="plus" className={createClassName} onClick={e => this.create()}/>,
-                                <FontAwesomeIcon icon="minus" className={deleteClassName} onClick={e => this.remove()}/>,
-                                <FontAwesomeIcon icon="info" className={"info"} onClick={e => this.info()}/>,
-                                <FontAwesomeIcon icon="sign-out-alt" className={quitClassName} onClick={e => this.quit()}/>,
-                                <FontAwesomeIcon icon="sign-in-alt" className={joinClassName} onClick={e => this.join()}/>
-                            ]}
-                            onSelect={selected => this.setState({gameSelected: selected && selected[0]})}/>
-                        {this.gameInfo()}
-                        {this.state.modal}
+                            onSelected={selected => this.setState({gameSelected: selected ? this.state.games.filter(game => game.getName() === selected[0])[0] : null})}
+                            defaultOrder={{
+                                direction: 'up',
+                                header: "Partie"
+                            }}>
+                    </Table>
+                    <ButtonGroup size="large" appearance="simple" color="secondary">
+                        <Button icon="plus" onClick={() => this.setState({gameInfo: "create", displayGameInfo: true})}></Button>
+                        <Button icon="minus" onClick={() => this.remove()} disabled={!this.state.gameSelected}></Button>
+                        <Button icon="info" onClick={() =>  this.setState({gameInfo: "info", displayGameInfo: true})} disabled={!this.state.gameSelected}></Button>
+                        <Button icon="sign-in-alt" align="right" onClick={() => this.join()} disabled={!this.state.gameSelected}></Button>
+                        <Button icon="sign-out-alt" onClick={() => this.quit()} disabled={!this.state.gameSelected || !this.state.currentGame || this.state.currentGame.getName() !== this.state.gameSelected.getName()}></Button>
+                    </ButtonGroup>
+                    <GameModal  key={this.state.gameInfo + this.state.gameSelected?.getName()}
+                                open={this.state.displayGameInfo}
+                                game={this.state.gameSelected}
+                                type={this.state.gameInfo}
+                                onClose={(gameData) => {
+                                    gameData ? this.props.socket.emit("createGame", gameData) : this.setState({displayGameInfo: false})
+                                }}/>
+                    <Modal  className="warning-game-started"
+                            open={this.state.warningGameStarted}
+                            color="main"
+                            appearance="simple"
+                            type="confirm"
+                            onClose={(action) => {
+                                this.setState({warningGameStarted: null})
+                                action === "confirm" && this.props.socket.emit("join", this.state.gameSelected.getName())
+                            }}>
+                            <h3>Partie en cours!</h3>
+                            <p>Vous pouvez rejoindre en tant que spectateur.
+                            Une fois la manche terminée vous pourrez rejoindre la partie.
+                            </p>
+                            <p className="detail">(Votre score initial sera égal à la moyenne des scores des autres joueurs)</p>
+                    </Modal>
                 </div>
     }
 }

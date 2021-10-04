@@ -2,6 +2,7 @@
 /* Normalize */
 @import "../node_modules/normalize.css/normalize.css";
 @import "../node_modules/animate.css/animate.css";
+@import "../node_modules/pizi-react/src/main";
 
 @color-black: #222;
 @color-black-light: #444;
@@ -65,19 +66,8 @@ app{
     background-color: @color-main;
     position: relative;
     overflow: hidden;
-
-    h2{
-        font-weight: normal;
-        font-size: 36px;
-        margin-top: 0;
     
-        @media (max-width: @breakpoint-xs){
-            font-size: 20px;
-        }
-    }
-    
-    
-    input{
+    /* input{
         outline: none;
         min-width: 200px;
         height: 50px;
@@ -94,7 +84,7 @@ app{
             font-size: 25px;
             line-height: 25px;
         }
-    }
+    } */
     
     button{
         background-color: transparent;  
@@ -107,7 +97,7 @@ app{
         letter-spacing: @letter-spacing;
     
         &:hover{
-            background-color: @color-main-light;
+            //background-color: @color-main-light;
         }
     
         @media (max-width: @breakpoint-xs){

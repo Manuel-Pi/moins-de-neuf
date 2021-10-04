@@ -3,10 +3,10 @@ const CardGame = require('./pizi-card-game');
 const mongoose = require('mongoose');
 const ioClient = require('socket.io-client');
 
-module.exports = function(socketServer, console, url){
+module.exports = function({socketServer, console, host}){
     // Get io for a specific namespace
     const io = socketServer.of('/pizi-moins-de-neuf');
-    const ioClientChat = ioClient(url + '/pizi-chat/moinsdeneuf');
+    const ioClientChat = ioClient(host + '/pizi-chat/moinsdeneuf');
 
     // Init state
     let CONNEXION_ON = true;
@@ -71,7 +71,7 @@ module.exports = function(socketServer, console, url){
             let [game, player] = getGameAndPlayer(socket);
             if(!player) return;
 
-            if(game.conf.playerKickTimeout !== "Jamais" && !KICKABLE_PLAYERS[player.name]) KICKABLE_PLAYERS[player.name] = setTimeout( () => {
+            if(game.conf.playerKickTimeout !== ("Infini" || "Jamais") && !KICKABLE_PLAYERS[player.name]) KICKABLE_PLAYERS[player.name] = setTimeout( () => {
                 CardManager.kickPlayer(player, game, GAMES);
                 CardManager.saveGame(game);
                 io.to(game.name).emit('gameInfo', CardManager.getPublicGameInfo(game));
@@ -142,6 +142,7 @@ module.exports = function(socketServer, console, url){
         });
 
         socket.on('createGame', gameProps => {
+            if(!gameProps) return
             const gameNumber = Object.keys(GAMES).length;
             if(gameNumber > 10) return;
             CardManager.saveGame(CardManager.createGame(GAMES, gameProps));

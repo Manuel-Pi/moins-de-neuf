@@ -1,26 +1,33 @@
 const webpack = require('webpack');
+const path = require('path');
 const CopyPlugin = require('copy-webpack-plugin');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
+
 module.exports = {
-    mode: "production",
-
     // Enable sourcemaps for debugging webpack's output.
-    devtool: "source-map",
+    devtool: "eval-source-map",
 
+    context: path.resolve(__dirname),
+    
     output:{
         libraryTarget: 'umd',
-        globalObject: 'this'
+        globalObject: 'this',
+        publicPath: '/moins-de-neuf-dev'
     },
-
+    
     resolve: {
         // Add '.ts' and '.tsx' as resolvable extensions.
-        extensions: [".ts", ".tsx",".js", ".jsx", ".less"]
+        extensions: [".ts", ".tsx",".js", ".jsx", ".less"],
+        alias: {
+            react: path.join(__dirname, "node_modules/react")
+        }
     },
 
     module: {
         rules: [
             {
                 test: /\.ts(x?)$/,
-                exclude: /node_modules/,
                 use: [
                     {
                         loader: "ts-loader"
@@ -35,20 +42,28 @@ module.exports = {
             },
             {
                 test: /\.less$/,
+                exclude: /node_modules/,
                 use: [
                     {
-                        loader: "file-loader",
+                        loader: MiniCssExtractPlugin.loader,
                         options: {
-                            name: "style.css"
-                        }
-                    },
-                    "extract-loader",
+          
+                        },
+                      },
+                    "css-loader",
+                    "less-loader"
+                ]
+            },
+            {
+                test: /node_modules.*\.less$/,
+                use: [
                     {
-                        loader: "css-loader",
+                        loader: MiniCssExtractPlugin.loader,
                         options: {
-                            sourceMap: true
-                        }
-                    },
+           
+                        },
+                      },
+                    "css-loader",
                     "less-loader"
                 ]
             }
@@ -67,8 +82,22 @@ module.exports = {
                     to: "server"
                 }
             ],
-          })
-    ]
+        }),
+        new MiniCssExtractPlugin({
+            // Options similar to the same options in webpackOptions.output
+            // all options are optional
+            filename: 'style.css',
+            ignoreOrder: false, // Enable to remove warnings about conflicting order
+        })
+    ],
+
+    optimization: {
+        minimize: true,
+        minimizer: [
+            new CssMinimizerPlugin(),
+            '...'
+        ]
+    }
 
     // When importing a module whose path matches one of the following, just
     // assume a corresponding global variable exists and use that instead.
@@ -79,3 +108,18 @@ module.exports = {
         "react-dom": "ReactDOM"
     }*/
 }
+
+/*
+module.exports = (env, argv) => {
+    if (argv.mode === 'development') {
+        config.devtool = "eval-source-map"
+        config.optimization.minimize = false
+    }
+  
+    if (argv.mode === 'production') {
+
+    }
+  
+    return config;
+}*/
+  

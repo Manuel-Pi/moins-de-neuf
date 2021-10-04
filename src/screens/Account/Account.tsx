@@ -1,8 +1,7 @@
+import { Heading, TextInput } from 'pizi-react';
 import React, {Component, useReducer } from 'react';
-import { TextInput } from '../../components/Input/TextInput';
-import { Table } from '../../components/Table/Table';
 import { Rest } from '../../utils/Rest';
-import { CreateClassName } from '../../utils/Utils';
+import { ClassNameHelper } from '../../utils/Utils';
 
 type AccountState = {
     user: {
@@ -37,20 +36,21 @@ export class Account extends Component<AccountProps, AccountState> {
 }
 
     render(){
-
-        const className = CreateClassName({
-            "screen account": true
-        }, this.props.className);
-
-        return  <div className={className}>
-                    <h1>Compte</h1>
+        return  <div className={ClassNameHelper("screen account", this.props.className)}>
+                    <Heading tag="h1" appearance="simple" color="secondary">Compte</Heading>
                     <div className="content">
-                        <TextInput  className="disabled"
-                                    initialValue={this.state.user.login}
-                                    placeholder="Username"/>
-                        <TextInput  className="disabled"
-                                    initialValue={this.state.user.role}
-                                    placeholder="Role"/>
+                        <TextInput  label="Username"
+                                    color="secondary"
+                                    defaultValue={"this.state.user.login"}
+                                    readOnly/>
+                        <TextInput  label="Role"
+                                    color="secondary"
+                                    defaultValue={"this.state.user.role"}
+                                    readOnly/>
+                        <TextInput  label="Email"
+                                    color="secondary"
+                                    defaultValue={"exemple@pizi.com"}
+                                    readOnly/>
                     </div>
                 </div>
     }

@@ -4,7 +4,6 @@ import { Lobby } from './screens/Lobby/Lobby';
 import { Menu } from './components/Menu/Menu';
 import { GameBoard } from './screens/GameBoard/GameBoard';
 import { CreateClassName } from './utils/Utils';
-import { faMdb } from '@fortawesome/free-brands-svg-icons';
 import { Modal } from './components/Modal/Modal';
 import { Players } from './screens/Players/Players';
 import { Account } from './screens/Account/Account';

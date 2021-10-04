@@ -2,10 +2,12 @@
     -webkit-overflow-scrolling: touch;
 }
 
+@screen-max-width: 500px;
+
 .screen{
     width: 100%;
     height: 100%;
-    padding: 40px calc(50% ~"-" 250px);
+    padding: 80px calc(50% ~"-" (@screen-max-width / 2)) 40px calc(50% ~"-" (@screen-max-width / 2));
     background-color: @color-main;
     color: #222;
     display: flex;
@@ -15,12 +17,8 @@
     position: relative;
 
     h1{
-        margin: 0;
         width: 100%;
-        padding: 36px 0;
-        padding-bottom: 36px;
-        font-size: 50px;
-        flex: 0 0;
+        padding: 0;
     }
 
     @media (max-width: @breakpoint-xs){
@@ -29,6 +27,14 @@
         h1{
             padding: 16px 0;
             font-size: 40px;
+        }
+    }
+
+    .pizi-table{
+        width: 100%;
+
+        td{
+            font-size: @font-large;
         }
     }
 }

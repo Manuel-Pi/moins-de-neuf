@@ -2,10 +2,12 @@ import React, {Component, useReducer } from 'react';
 import { TextInput } from '../../components/Input/TextInput';
 import { Rest } from '../../utils/Rest';
 import { CreateClassName } from '../../utils/Utils';
-import Chart from 'chart.js';
+import {Chart, RadialLinearScale, RadarController, PointElement, LineElement} from 'chart.js';
 import { Table } from '../../components/Table/Table';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { PlayerModel } from '../../components/Player/PlayerModel';
+import { Heading } from 'pizi-react';
+Chart.register(RadarController, RadialLinearScale, PointElement, LineElement);
 
 type StatsState = {
     currentScreen: string
@@ -49,28 +51,31 @@ export class Stats extends Component<StatsProps, StatsState> {
                 }]
             },
             options: {
-                scale: {
-                    ticks: {
+                
+                scales: {
+                    r: {
                         beginAtZero: true,
-                        showLabelBackdrop: false,
                         min: 0,
                         max: 6,
-                        stepSize: 2,
-                        display: false
-                    },
-                    pointLabels: {
-                        fontSize: 12,
-                        fontColor: '#222'
-                    },
-                    angleLines: {
-                        color: "rgba(0, 0, 0, 0.2)"
-                    },
-                    gridLines: {
-                        color: ["rgba(0, 0, 0, 0.1)", "rgba(0, 0, 0, 0.2)", "rgba(0, 0, 0, 0.3)"]
+                        ticks: {
+                            showLabelBackdrop: false,
+                            stepSize: 2,
+                            display: false
+                        },
+                        pointLabels: {
+                            color: '#222',
+                            font:{
+                                size: 12,
+                                
+                            }
+                        },
+                        angleLines: {
+                            color: "rgba(0, 0, 0, 0.2)"
+                        },
+                        grid: {
+                            color: ["rgba(0, 0, 0, 0.1)", "rgba(0, 0, 0, 0.2)", "rgba(0, 0, 0, 0.3)"]
+                        }
                     }
-                },
-                legend: {
-                    display: false
                 },
                 layout: {
                     padding: {
@@ -218,15 +223,16 @@ export class Stats extends Component<StatsProps, StatsState> {
         }, this.props.className);
 
         return  <div className={className}>
-                    <h1>Stats 
+                    <Heading tag="h1" appearance="simple" color="secondary">
+                        Stats 
                         <div className="options">
                             <FontAwesomeIcon className={this.state.currentScreen === "users" ? "selected" : ""} icon="list-ol" onClick={() => this.setState({currentScreen: 'users'})}/>
                             <FontAwesomeIcon className={this.state.currentScreen === "user" ? "selected" : ""} icon="chart-bar" onClick={() => this.setState({currentScreen: 'user'})}/>
                         </div>
-                    </h1>
-                    <h2 className="title">
+                    </Heading>
+                    <Heading tag="h2" appearance="simple" color="secondary">
                         {this.state.currentScreen === "users" ? <><FontAwesomeIcon icon="users"/>Classement</> : <><FontAwesomeIcon icon="user"/>{this.state.currentPlayer && this.state.currentPlayer.getName()}</>}
-                    </h2>
+                    </Heading>
                     {this.getUserScreen()}
                     {this.getUsersScreen()}
                 </div>

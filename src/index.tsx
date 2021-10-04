@@ -45,6 +45,7 @@ import { faUser } from "@fortawesome/free-solid-svg-icons/faUser";
 import { faUserNinja } from "@fortawesome/free-solid-svg-icons/faUserNinja";
 import { faUserSecret } from "@fortawesome/free-solid-svg-icons/faUserSecret";
 import { faListOl } from "@fortawesome/free-solid-svg-icons/faListOl";
+import { faChevronLeft, faChevronRight } from "@fortawesome/free-solid-svg-icons";
 // Add custom icon to Font Awesome
 library.add(faCheck, 
             faGraduationCap, 
@@ -87,7 +88,9 @@ library.add(faCheck,
             faUser,
             faUserNinja,
             faUserSecret,
-            faListOl);
+            faListOl,
+            faChevronLeft,
+            faChevronRight);
 // Used for webpack to load less
 !!style;
 !!React;

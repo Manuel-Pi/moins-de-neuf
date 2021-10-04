@@ -89,8 +89,8 @@ const removeGame = (game) => {
     }
 }
 
-const createGame = (games, gameData = {name}, force = false) => {
-    if(!gameData.name) {
+const createGame = (games, gameData = {}, force = false) => {
+    if(!gameData || !gameData.name) {
         console.error("No name specified for game");
         return;
     }
@@ -241,7 +241,7 @@ const endRound = (game, callingPlayer) => {
         }
     });
     // by time
-    if(!game.gameEnd && game.conf.gameEndTime !== "Jamais" && ((new Date()).getTime() - game.startTime) > valueToMillisecond(game.conf.gameEndTime)){
+    if(!game.gameEnd && game.conf.gameEndTime !== ("Infini" || "Jamais") && ((new Date()).getTime() - game.startTime) > valueToMillisecond(game.conf.gameEndTime)){
         game.gameEnd = "time";
     }
 
@@ -373,6 +373,13 @@ const updatePlayer = (newPlayerInfo, game = null)=> {
             return player;
         } 
     }
+    for(let i = 0; i < game.spectators.length; i++){
+        let spectator = game.spectators[i];
+        if(spectator.name === newPlayerInfo.name){
+            Object.assign(spectator, newPlayerInfo);
+            return spectator;
+        } 
+    }
 }
 
 const nextAction = (game)=> {
@@ -409,7 +416,7 @@ const getPublicGames = (games) => {
     while(i--){
         let game = games[Object.keys(games)[i]];
         game.lastTime = game.lastTime || (new Date()).getTime();
-        if(game.conf.gameKickTimeout !== "Jamais" && (((new Date()).getTime() - game.lastTime) >  valueToMillisecond(game.conf.gameKickTimeout))){
+        if(game.conf.gameKickTimeout !== ("Infini" || "Jamais") && (((new Date()).getTime() - game.lastTime) >  valueToMillisecond(game.conf.gameKickTimeout))){
             removeGame(game);
             console.info('Delete game: ' + game.name + ' after ' + Math.round(((new Date()).getTime() - game.lastTime) / 1000) + "s");
             delete games[Object.keys(games)[i]];

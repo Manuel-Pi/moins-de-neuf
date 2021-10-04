@@ -1,29 +1,21 @@
 .lobby{
 
-    .games{
-        width: 100%;
-        flex: 1 auto;
-
-        .header{
-            background-color: @color-main;
-        }
+    > .pizi-table{
 
         th{
             &:nth-child(1){
-                width: 200px;
+                width: 300px;
             }
             &:nth-child(2){
-                width: 100px;
+                width: 10px;
             }
             &:nth-child(3){
-                width: 100px;
+                width: 10px;
             }
         }
 
         td{
-            &:nth-child(1){
-                
-            }
+
             &:nth-child(2){
                 text-align: center;
                 letter-spacing: 4px;
@@ -34,175 +26,51 @@
                 font-size: 14px;
             }
         }
-    
-        .selected{
-            td{
-                background-color: #333;
-                color: @color-main;
-            }
+    }
+
+    .pizi-modal{
+
+        h3{
+            padding: 0;
+            border-left: 0;
         }
-    
-        > .actions{
-            padding: 40px 20px 8px 20px;
-            font-size: 26px;
 
-            svg{
-                cursor: pointer;
-
-                &:active{
-                    animation-iteration-count: 1;
+        .pizi-table{
+            th{
+                &:nth-child(1){
+                    width: 40px;
+                }
+                &:nth-child(3){
+                    width: 100px;
                 }
             }
-
-            svg + svg{
-                margin-left: 40px;
-            }
-    
-            svg.disabled{
-                pointer-events: none;
-                opacity: 0.3;
-            }
-
-            svg.join, svg.quit{
-                float: right;
+            td{
+                &:nth-child(2){
+                    font-size: @font-medium;
+                }
+                &:nth-child(3){
+                    text-align: right;
+                }
             }
         }
     }
 
-    .modal{
-        .create{
-            text-align: center;
-            font-size: 38px;
-            color: #888;
-            margin-top: 26px;
-            cursor: pointer;
-            border-top: 1px solid #444;
-            padding-top: 8px;
-        }
+    .warning-game-started{
 
-        .tabs{
-            h2{
-                padding-bottom: 8px;
-            }
-            .active h2{
-                border-bottom: 1px solid #555;
-            }
-        }
-
-        .players-info{
-            width: 100%;
-
-            .header{
-                border-bottom: 1px solid @color-main;
-            }
-
-            th{
-                color: @color-main;
-                font-size: 14px;
-
-                &:nth-child(1){
-                    width: 40px;
-                    font-size: 24px;
-                    text-align: center;
-                }
-
-                &:nth-child(2){
-                    width: 280px;
-                }
-
-                &:nth-child(3){
-                    width: 80px;
-                }
-            }
-
-            td{
-                color: #888;
-                font-size: 24px;
-
-                &:nth-child(1){
-                    font-size: 28px;
-                    width: 40px;
-                    text-align: center;
-                }
-
-                &:nth-child(2){
-                    width: 280px;
-                }
-
-                &:nth-child(3){
-                    width: 80px;
-                }
-            }
-        }   
-
-        h3{
-            margin-top: 0;
-        }
-        
-        p{
-            font-size: 16px;
-            letter-spacing: 0.5px;
-            color: #ccc;
+        p {
+            color: @color-white;
+            font-size: @font-medium;
 
             &.detail{
-                font-size: 14px;
-                color: #aaa;
+                color: @color-main;
             }
         }
     }
 
     @media (max-width: @breakpoint-xs){
-        .login .logo{
-            width: 300px;
-            margin-bottom: 0px;
-        }
-
-        table td, table th{
-            font-size: 16px;
-        }
-
-        .table{
-            .actions{
-                padding: 16px;
-
-                svg{
-                    font-size: 24px;
-                }
-            }
-        }
-
-        .games{
-            height: calc(100% - 60px);
-
-            th{
-                font-size: 12px;
-            }
-
-           td{
-               font-size: 14px;
-
-               &:nth-child(2){
-                    font-size: 16px;
-               }
-
-               &:nth-child(3){
-                    font-size: 10px;
-                    letter-spacing: 1px;
-                }
-           }
-        }
-
-        .modal{
-            .players-info{
-
-                td{
-                    font-size: 18px;
-
-                    &:nth-child(1){
-                        font-size: 16px;
-                   }
-                }
-            }
+ 
+        .pizi-modal{
+   
         }
     }
 }
