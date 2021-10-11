@@ -3,14 +3,20 @@ import { PlayerModel } from "../../components/Player/PlayerModel";
 
 
 type GameJsonProps = {
-    action: string
-    currentPlayer: string
     name: string
-    cards: any[]
     players: any[]
-    spectators: any[]
+    playedCards: any[][]
+    currentPlayer: string
+    action: string
+    scores: any
     quickPlay: boolean
     conf: GameInfo
+    gameEnd: any
+    startTime: any
+    turn: any
+    roundStartTime:  any
+    round: any
+    spectators: any[]
 }
 
 export type GameInfo = {
@@ -30,25 +36,35 @@ export type GameInfo = {
 }
 
 export class GameModel{
-    private action: string;
-    private currentPlayer: string;
-    private name: string;
-    private playedCards: CardModel[] = [];
-    private playerModels: PlayerModel[] = [];
+    private name: string
+    private playerModels: PlayerModel[] = []
+    private playedCards: CardModel[][] = []
+    private currentPlayer: string
+    private action: string
+    private scores: any
+    private quickPlay: boolean
+    private conf: GameInfo = null
+    private gameEnd: any
+    private startTime: any
+    private turn: number = 0
+    private roundStartTime: any
+    private round: any
     private spectatorModels: PlayerModel[] = [];
-    private quickPlay: boolean;
-    private turn: number = 0;
-    private conf: GameInfo = null;
 
     constructor(props: GameJsonProps){
         this.action = props.action;
         this.currentPlayer = props.currentPlayer;
         this.name = props.name;
-        this.playedCards = props.cards ? props.cards.map(card => new CardModel(card)): [];
+        this.playedCards = props.playedCards ? props.playedCards.map(cards => cards.map((card: any) => new CardModel(card))): [];
         this.playerModels = props.players ? props.players.map(player => new PlayerModel(player)): [];
         this.quickPlay = props.quickPlay;
         this.conf = props.conf;
         this.spectatorModels = props.spectators ? props.spectators.map(player => new PlayerModel(player)): [];
+        this.turn = props.turn
+        this.startTime = props.startTime
+        this.gameEnd = props.gameEnd
+        this.round = props.round
+        this.roundStartTime = props.roundStartTime
     }
 
     public getAction() {
@@ -90,7 +106,30 @@ export class GameModel{
     public isFull(){
         return this.getTotalPlayers() >= this.conf.maxPlayer
     }
+
+    public getGameEnd(){
+        return this.gameEnd
+    }
     
+    public getScores(){
+        return this.scores
+    }
+
+    public getStartTime(){
+        return this.startTime
+    }
+
+    public getTurn(){
+        return this.turn
+    }
+
+    public getRound(){
+        return this.round
+    }
+
+    public getRoundStartTime(){
+        return this.roundStartTime
+    }
 }
 
 const getValue = (card: {value: string}) => {

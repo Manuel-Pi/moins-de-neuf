@@ -1,4 +1,4 @@
-import { Heading, TextInput } from 'pizi-react';
+import { AppScreenProps, Heading, TextInput } from 'pizi-react';
 import React, {Component, useReducer } from 'react';
 import { Rest } from '../../utils/Rest';
 import { ClassNameHelper } from '../../utils/Utils';
@@ -10,7 +10,7 @@ type AccountState = {
     }
 }
 
-type AccountProps = {
+interface AccountProps extends AppScreenProps {
     className?: string
     token: any
 }

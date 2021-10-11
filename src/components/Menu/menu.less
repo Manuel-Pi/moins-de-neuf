@@ -16,6 +16,7 @@
     margin: 0 auto;
     z-index: 200;
     user-select: none;
+    display: none;
 
     .logo{
         height: 32px;
@@ -86,78 +87,6 @@
         &.has-current-game{
             .current-game{
                 visibility: visible;
-            }
-        }
-
-        .current-game{
-            height: 60px;
-            padding: 16px;
-            width: 100%;
-            background-color: rgba(205, 133, 63, 0.7);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            visibility: hidden;
-
-            .current-info{
-                width: calc(100% ~"-" 230px);
-                display: inline-block;
-
-                .label{
-                    font-size: 15px;
-                    letter-spacing: 1px;
-                    color: #222;
-                }
-
-                .game-name{
-                    font-size: 28px;
-                    color: #bbb;
-                    font-size: 20px;
-                    word-break: break-all;
-                    white-space: nowrap;
-                    overflow: hidden;
-                    text-overflow: ellipsis;
-                }
-            }
-
-            span{
-                font-size: 16px;
-                padding: 8px 16px;
-                color: #bbb;
-                cursor: pointer;
-
-                &:hover{
-                    color: #FFF !important;
-
-                    svg{
-                        color: #FFF !important;
-                    }
-                }
-
-                svg{
-                    margin: 4px auto;
-                    display: block;
-                    font-size: 12px;
-                    color: #ccc;
-
-                    &.fa-play{
-                        animation-iteration-count: infinite;
-                    }
-                }
-
-                span{
-                    padding: 0px;
-                }
-
-                &:nth-child(3){
-                    font-size: 18px;
-                    color: #ccc;
-
-                    svg{
-                        font-size: 16px;
-                        color: #ddd;
-                    }
-                }
             }
         }
 

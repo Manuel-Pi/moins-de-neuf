@@ -6,6 +6,8 @@ const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
 
 module.exports = {
     // Enable sourcemaps for debugging webpack's output.
+    mode: "production",
+    //mode: "development",
     devtool: "eval-source-map",
 
     context: path.resolve(__dirname),
@@ -30,7 +32,10 @@ module.exports = {
                 test: /\.ts(x?)$/,
                 use: [
                     {
-                        loader: "ts-loader"
+                        loader: "ts-loader",
+                        options: {
+                            allowTsInNodeModules: true
+                        }
                     }
                 ]
             },

@@ -4,8 +4,9 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { CreateClassName } from '../../utils/Utils';
 import { TextInput } from '../../components/Input/TextInput';
 import { Rest } from '../../utils/Rest';
+import { AppScreenProps } from 'pizi-react';
 
-type LoginProps = {
+interface LoginProps extends AppScreenProps {
     className?: string
     onLogin: (username:any, token:any) => void
     socket: any

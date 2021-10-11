@@ -1,4 +1,5 @@
 {
     "type": "socket",
-    "entry": "pizi-moins-de-neuf.js"
+    "entry": "pizi-moins-de-neuf.js",
+    "spa": true
 }

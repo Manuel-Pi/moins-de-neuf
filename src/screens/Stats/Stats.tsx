@@ -6,7 +6,7 @@ import {Chart, RadialLinearScale, RadarController, PointElement, LineElement} fr
 import { Table } from '../../components/Table/Table';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { PlayerModel } from '../../components/Player/PlayerModel';
-import { Heading } from 'pizi-react';
+import { AppScreenProps, Heading } from 'pizi-react';
 Chart.register(RadarController, RadialLinearScale, PointElement, LineElement);
 
 type StatsState = {
@@ -15,7 +15,7 @@ type StatsState = {
     currentPlayer: PlayerModel
 }
 
-type StatsProps = {
+interface StatsProps extends AppScreenProps {
     className?: string
     token: any
     username: string
