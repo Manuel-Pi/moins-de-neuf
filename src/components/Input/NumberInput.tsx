@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { CreateClassName } from '../../utils/Utils';
+import { ClassNameHelper } from 'pizi-react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 type NumberInputProps = {
@@ -19,7 +19,7 @@ export const NumberInput = ({ className = "", onChange = (() => null), initialVa
 
     React.useEffect(() => { () => useState(initialValue) });
 
-    const inputClassName = CreateClassName({
+    const inputClassName = ClassNameHelper({
         "input": true,
         "number-input": true,
         "is-max": isMax,

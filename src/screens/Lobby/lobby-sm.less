@@ -1,0 +1,35 @@
+@media (min-width: @sm){
+
+    > .pizi-table{
+
+        th{
+            &:nth-child(1){
+                width: 300px;
+            }
+            &:nth-child(2){
+                width: 10px;
+            }
+            &:nth-child(3){
+                width: 10px;
+            }
+        }
+
+        td{
+            &:nth-child(2){
+                text-align: center;
+                letter-spacing: 4px;
+                font-size: 1.2rem;
+                font-weight: 700;
+            }
+            &:nth-child(3){
+                font-size: 1.2rem;
+            }
+        }
+    }
+
+    .pizi-modal{
+        .pizi-modal-container{
+            width: 370px;
+        }
+    }
+}

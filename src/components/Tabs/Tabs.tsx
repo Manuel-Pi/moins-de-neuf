@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { CreateClassName } from '../../utils/Utils';
+import { ClassNameHelper } from 'pizi-react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 type TabsProps = {

@@ -6,8 +6,8 @@ const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
 
 module.exports = {
     // Enable sourcemaps for debugging webpack's output.
-    mode: "production",
-    //mode: "development",
+    //mode: "production",
+    mode: "development",
     devtool: "eval-source-map",
 
     context: path.resolve(__dirname),
@@ -82,6 +82,7 @@ module.exports = {
             patterns: [
                 "src/index.html",
                 "src/icon.png",
+                "src/manifest.json",
                 {
                     from: "src/server",
                     to: "server"
@@ -97,7 +98,7 @@ module.exports = {
     ],
 
     optimization: {
-        minimize: true,
+        minimize: false,
         minimizer: [
             new CssMinimizerPlugin(),
             '...'

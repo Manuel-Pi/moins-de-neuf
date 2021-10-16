@@ -1,15 +1,15 @@
 import { Modal, TextInput, NumberInput, ListInput, Switch, Table, Heading} from 'pizi-react';
-import React, { useEffect, useState } from 'react';
-import {Tabs, Tab} from 'pizi-react';
+import React, { useState } from 'react';
+import {Tab} from 'pizi-react';
 import { GameInfo, GameModel } from '../GameBoard/GameModel';
 import { Score } from '../../components/Player/Score';
-import { defaultProps } from 'pizi-react/src/components/PiziComponent/PiziComponent';
 
 export interface GameModalProps {
 	onClose: (gameInfos: GameInfo) => void
     type: "create" | "info" 
     open?: boolean
     game?: GameModel
+    fullScreen?: boolean
 }
 
 const DEFAULT_GAME: GameInfo = {
@@ -32,7 +32,8 @@ export const GameModal: React.FC<GameModalProps & React.HTMLAttributes<HTMLDivEl
 	onClose = () => null,
     type = "create",
     game,
-    open = true
+    open = true,
+    fullScreen = false
 }) => {
 
     const [gameInfo, setGameInfo] = useState(type === "info" && game ? game.getConf() : DEFAULT_GAME);
@@ -52,7 +53,8 @@ export const GameModal: React.FC<GameModalProps & React.HTMLAttributes<HTMLDivEl
                     color="main"  
                     confirmButtonDisabled={() => hasError}
                     onClose={(action) => onClose(action === "confirm" ? gameInfo : null)}
-                    header={!isInfo ? "Nouvelle Partie" : "Infos"}>
+                    header={!isInfo ? "Nouvelle Partie" : "Infos"}
+                    fullScreen={fullScreen}>
                 <Tab title={"Général"} default>
                     <TextInput  label="Nom"
                                 autoFocus

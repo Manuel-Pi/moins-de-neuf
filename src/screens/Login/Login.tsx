@@ -1,7 +1,7 @@
-import React, { useState, useEffect, CSSProperties } from 'react';
+import React, { useState } from 'react';
 import { Logo } from '../../components/Logo/Logo';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { CreateClassName } from '../../utils/Utils';
+import { ClassNameHelper } from 'pizi-react';
 import { TextInput } from '../../components/Input/TextInput';
 import { Rest } from '../../utils/Rest';
 import { AppScreenProps } from 'pizi-react';
@@ -17,7 +17,7 @@ export const Login = ({ onLogin = e => null, className, socket}:LoginProps) => {
     const[inputValue, setInputValue] = useState("");
     const[passwordValue, setPasswordValue] = useState("check");
 
-    const inputsClassName = CreateClassName({
+    const inputsClassName = ClassNameHelper({
         "user-valid": userValid
     }, "inputs");
 

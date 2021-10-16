@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { CreateClassName } from '../../Utils/Utils';
+import { ClassNameHelper } from 'pizi-react';
 
 type TableProps = {
     className?: string
@@ -15,7 +15,7 @@ type TableProps = {
 
 export const Table = ({ className, header, body = [], actions = [], onSelect, selectable = false, animation = "", animationIncrement = 1, animationDelay = 0}: TableProps) => {
     const[selectedRow, setSelectedRow] = useState(null);
-    const tableClassName = CreateClassName({
+    const tableClassName = ClassNameHelper({
         "table": true,
         "selectable": selectable
     }, className);
@@ -23,7 +23,7 @@ export const Table = ({ className, header, body = [], actions = [], onSelect, se
     const animationReverse = animation.indexOf("-reverse") !== -1;
     animation = animation.replace("-reverse", "");
 
-    const trClassName = CreateClassName({
+    const trClassName = ClassNameHelper({
         "animate__animated": !!animation
     }, animation);
 

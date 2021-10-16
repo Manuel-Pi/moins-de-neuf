@@ -6,7 +6,7 @@ import { PlayerModel } from '../../components/Player/PlayerModel';
 import { Players } from '../../components/Player/Players';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { GameModel, CheckPlayedCards } from './GameModel';
-import { CreateClassName } from '../../utils/Utils';
+import { ClassNameHelper } from 'pizi-react';
 import { Score } from '../../components/Player/Score';
 import { Logo } from '../../components/Logo/Logo';
 import { Modal } from '../../components/Modal/Modal';
@@ -331,7 +331,7 @@ export class GameBoard extends Component<GameProps, GameState> {
     
     render(){
         if(!this.props.currentGame) return null;
-        const className = CreateClassName({
+        const className = ClassNameHelper({
             "gameboard": true,
             "my-turn": this.state.isMyTurn,
             "game-running": !!this.state.action
@@ -339,7 +339,7 @@ export class GameBoard extends Component<GameProps, GameState> {
 
         const needToAct = this.state.isMyTurn && ((this.state.action === "play" && !this.state.currentSelection.length) || (this.state.action === "pick" && !this.state.pickSelection))
 
-        const actionClassName = CreateClassName({
+        const actionClassName = ClassNameHelper({
             "actions": true,
             "disabled": this.state.currentPlayer && (this.props.username !== this.state.currentPlayer) && !this.state.quickPlay,
             "need-to-act": needToAct,

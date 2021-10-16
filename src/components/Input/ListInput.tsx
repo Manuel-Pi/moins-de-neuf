@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { CreateClassName } from '../../utils/Utils';
+import { ClassNameHelper } from 'pizi-react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 type ListInputProps = {
@@ -18,7 +18,7 @@ export const ListInput = ({ className = "", onChange = (() => null), placeholder
 
     React.useEffect(() => { () => useState(initialValue) });
 
-    const inputClassName = CreateClassName({
+    const inputClassName = ClassNameHelper({
         "input": true,
         "list-input": true,
         "is-last": isLast,

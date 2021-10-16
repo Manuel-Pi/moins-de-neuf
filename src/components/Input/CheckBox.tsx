@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { CreateClassName } from '../../utils/Utils';
+import { ClassNameHelper } from 'pizi-react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 type CheckBoxProps = {
@@ -14,7 +14,7 @@ export const CheckBox = ({ className = "", onChange = (() => null), initialValue
 
     React.useEffect(() => { () => useState(initialValue) });
 
-    const inputClassName = CreateClassName({
+    const inputClassName = ClassNameHelper({
         "input": true,
         "checkbox": true,
         "checked": value

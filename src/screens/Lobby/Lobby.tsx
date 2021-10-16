@@ -1,7 +1,6 @@
 import React, {Component } from 'react';
 import { GameModel } from '../GameBoard/GameModel';
-import { Modal as OldModal} from '../../components/Modal/Modal';
-import {Table, Heading, Modal, AppScreenProps} from 'pizi-react';
+import {Table, Heading, Modal, AppScreenProps, Breakpoint} from 'pizi-react';
 import { ButtonGroup } from 'pizi-react/src/components/ButtonGroup/ButtonGroup';
 import { Button } from 'pizi-react/src/components/Button/Button';
 import { GameModal } from '../GameModal/GameModal';
@@ -19,6 +18,7 @@ interface LobbyProps extends AppScreenProps {
     chat: any
     games: GameModel[]
     currentGame: GameModel
+    breakpoint?: Breakpoint
 }
 
 export class Lobby extends Component<LobbyProps, LobbyState> {
@@ -86,6 +86,7 @@ export class Lobby extends Component<LobbyProps, LobbyState> {
                                 open={this.state.displayGameInfo}
                                 game={this.state.gameSelected}
                                 type={this.state.gameInfo}
+                                fullScreen={this.props.breakpoint === "xs"}
                                 onClose={(gameData) => {
                                     gameData ? this.props.socket.emit("createGame", gameData) : this.setState({displayGameInfo: false})
                                 }}/>

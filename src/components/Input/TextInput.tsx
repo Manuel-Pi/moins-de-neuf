@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { CreateClassName } from '../../utils/Utils';
+import { ClassNameHelper } from 'pizi-react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useEffect } from 'react';
 
@@ -20,7 +20,7 @@ export const TextInput = ({ className = "", onChange = (() => null), initialValu
         setValue(initialValue);
     }, [initialValue]);
 
-    const inputClassName = CreateClassName({
+    const inputClassName = ClassNameHelper({
         "input": true,
         "text-input": !password,
         "password-input": password,

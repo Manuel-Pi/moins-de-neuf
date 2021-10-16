@@ -1,7 +1,7 @@
 import { AppScreenProps, Heading, TextInput } from 'pizi-react';
 import React, {Component, useReducer } from 'react';
 import { Rest } from '../../utils/Rest';
-import { ClassNameHelper } from '../../utils/Utils';
+import { ClassNameHelper } from 'pizi-react';
 
 type AccountState = {
     user: {
@@ -29,10 +29,10 @@ export class Account extends Component<AccountProps, AccountState> {
 
     componentDidMount(){
         if(this.props.token) Rest.get('users/' + this.props.token.user).then(user => {
-            this.setState({user});
+            this.setState({user})
         }).catch(rep => {
-            console.log("error");
-        });
+            console.log("error")
+        })
 }
 
     render(){
@@ -42,15 +42,18 @@ export class Account extends Component<AccountProps, AccountState> {
                         <TextInput  label="Username"
                                     color="secondary"
                                     defaultValue={"this.state.user.login"}
-                                    readOnly/>
+                                    readOnly
+                                    appearance="alt"/>
                         <TextInput  label="Role"
                                     color="secondary"
                                     defaultValue={"this.state.user.role"}
-                                    readOnly/>
+                                    readOnly
+                                    appearance="alt"/>
                         <TextInput  label="Email"
                                     color="secondary"
                                     defaultValue={"exemple@pizi.com"}
-                                    readOnly/>
+                                    readOnly
+                                    appearance="alt"/>
                     </div>
                 </div>
     }

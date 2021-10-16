@@ -1,5 +1,5 @@
 /* Pizi React */
-@import "../node_modules/pizi-react/src/main";
+@import "../node_modules/pizi-react/src/styles/main";
 
 @color-black: #222;
 @color-black-light: #444;
@@ -42,43 +42,18 @@ html.standalone, html.standalone body, html.standalone app{
 }
 
 body{
-    background-color: #111;
-    color: @color-white;
-    //letter-spacing: @letter-spacing;
     display: flex;
     justify-content: center;
     align-items: center;
 }
 
-*{
-    box-sizing: border-box;
-}
-
 app{
+    -webkit-overflow-scrolling: touch;
     max-width: @app-max-width;
     display: block;
     background-color: @color-main;
     position: relative;
     overflow: hidden;
-    
-    /* input{
-        outline: none;
-        min-width: 200px;
-        height: 50px;
-        font-size: 30px;
-        line-height: 30px;
-        text-indent: 10px;
-        color: @color-black;
-        background-color: #DDD;
-        border: @border;
-        border-radius: @border-radius;
-    
-        @media (max-width: @breakpoint-xs){
-            height: 40px;
-            font-size: 25px;
-            line-height: 25px;
-        }
-    } */
     
     button{
         background-color: transparent;  
@@ -90,18 +65,10 @@ app{
         color: @color-black;
         letter-spacing: @letter-spacing;
     
-        &:hover{
-            //background-color: @color-main-light;
-        }
-    
         @media (max-width: @breakpoint-xs){
             font-size: 16px;
             padding: 6px 12px;
         }
-    }
-    
-    .hidden{
-        display: none !important;
     }
     
     .disabled{
@@ -113,6 +80,7 @@ app{
         animation:spin 1.5s linear infinite;
     }
 
+    @import "./app";
     @import "./components/Card/card";
     @import "./components/Hand/hand";
     @import "./components/Player/player";
@@ -128,11 +96,10 @@ app{
     @import "./screens/Players/players";
     @import "./screens/Account/account";
     @import "./screens/Stats/stats";
-    @import "./app";
 }
 
 .pizi-chat{
-    z-index: 200;
+    z-index: 2000;
 }
 
 .pizi-chat .pizi-chat_chat:not(.open) {

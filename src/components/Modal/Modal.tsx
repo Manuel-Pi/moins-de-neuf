@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { CreateClassName } from '../../utils/Utils';
+import { ClassNameHelper } from 'pizi-react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 type ModalProps = {
@@ -34,14 +34,14 @@ export const Modal = ({ className = "", children, onClose, onConfirm, fullScreen
                                     <button className="cancel" onClick={e => close()}>{type === 'alert' ? "Ok" : "Annuler"}</button>
                                 </div> : null; 
 
-return  <div className={ CreateClassName({
+return  <div className={ ClassNameHelper({
                             "modal": true,
                             "open": open,
                             "fullscreen": fullScreen,
-                            [type]: type
+                            [type]: !!type
                         }, className)}>
                 <div className="modal-container">
-                    <div className={CreateClassName({
+                    <div className={ClassNameHelper({
                                         "modal-content": true,
                                         "animate__animated": true,
                                         "animate__bounceIn": type && open,

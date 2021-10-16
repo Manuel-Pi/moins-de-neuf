@@ -1,7 +1,7 @@
 import React, { useState, useEffect, CSSProperties } from 'react';
 import { Logo } from '../Logo/Logo';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { CreateClassName } from '../../Utils/Utils';
+import { ClassNameHelper } from 'pizi-react';
 import { SCREEN } from '../../App';
 
 type MenuProps = {
@@ -20,7 +20,7 @@ export const Menu = ({username, onClick, className = "", currentGame = null, cur
     const [open, setOpen] = useState(false);
     const [closeAnimation, setCloseAnimation] = useState(false);
 
-    const menuClassName = CreateClassName({
+    const menuClassName = ClassNameHelper({
         "menu": true,
         "active": open,
         "has-current-game": !!currentGame,

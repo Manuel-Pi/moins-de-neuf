@@ -1,12 +1,11 @@
-import React, {Component, useReducer } from 'react';
+import React, {Component} from 'react';
 import { TextInput } from '../../components/Input/TextInput';
 import { Rest } from '../../utils/Rest';
-import { CreateClassName } from '../../utils/Utils';
 import {Chart, RadialLinearScale, RadarController, PointElement, LineElement} from 'chart.js';
 import { Table } from '../../components/Table/Table';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { PlayerModel } from '../../components/Player/PlayerModel';
-import { AppScreenProps, Heading } from 'pizi-react';
+import { AppScreenProps, Heading, ClassNameHelper } from 'pizi-react';
 Chart.register(RadarController, RadialLinearScale, PointElement, LineElement);
 
 type StatsState = {
@@ -217,7 +216,7 @@ export class Stats extends Component<StatsProps, StatsState> {
 
     render(){
 
-        const className = CreateClassName({
+        const className = ClassNameHelper({
             "screen stats": true,
             [this.state.currentScreen]: true,
         }, this.props.className);
