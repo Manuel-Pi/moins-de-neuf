@@ -16,7 +16,6 @@ module.exports = {
     },
     
     resolve: {
-        // Add '.ts' and '.tsx' as resolvable extensions.
         extensions: [".ts", ".tsx",".js", ".jsx", ".less"],
         alias: {
             react: path.join(__dirname, "node_modules/react")
@@ -84,8 +83,6 @@ module.exports = {
             ],
         }),
         new MiniCssExtractPlugin({
-            // Options similar to the same options in webpackOptions.output
-            // all options are optional
             filename: 'style.css',
             ignoreOrder: false, // Enable to remove warnings about conflicting order
         })

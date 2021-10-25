@@ -84,17 +84,17 @@ module.exports = function({socketServer, console, host}){
             // Clean players
             let i = game.players.length;
             while(i--){
-                if(!game.players[i].bot && !io.sockets[game.players[i].id]){
-                    CardManager.kickPlayer(game.players[i], GAMES[socket.game], GAMES);
-                    console.info("Clean player " + game.players[i].name);
-                    return;
+                if(!game.players[i].bot && !io.sockets.get(game.players[i].id)){
+                    console.info("Clean player " + game.players[i].name)
+                    CardManager.kickPlayer(game.players[i], GAMES[socket.game], GAMES)
+                    return
                 }
             }
 
             io.to(game.name).emit('gameInfo', CardManager.getPublicGameInfo(game));
             io.emit('setGames', CardManager.getPublicGames(GAMES));
             io.emit('setPlayers', CardManager.getPublicPlayers(PLAYERS, GAMES));
-        });
+        })
 
         socket.on('quit', (disconnect) => {
             const socketPlayer = PLAYERS[socket.player]
@@ -174,7 +174,7 @@ module.exports = function({socketServer, console, host}){
             if(allReady && game.conf.minPlayer <= readyCount){
                 CardManager.startGame(game);
                 socket.emit('setGames', CardManager.getPublicGames(GAMES));
-                game.players.forEach( player => io.sockets[player.id] && io.sockets[player.id].emit('setHand', player.hand));
+                game.players.forEach( player => io.sockets.get(player.id) && io.sockets.get(player.id).emit('setHand', player.hand));
                 // Play for bot
                 playForBot(game, socket);
             }

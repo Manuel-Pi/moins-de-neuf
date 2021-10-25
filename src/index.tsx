@@ -101,9 +101,15 @@ library.add(faCheck,
 
 // Declare window objects
 declare global {
+	interface Window {React: any, ReactDOM: any}
 	const io: any;
 	const PiziChat: any;
 }
+
+// Share with pizi-chat
+window.React = React
+window.ReactDOM = ReactDOM
+
 // Check if it's a standolone navigator (phone web app)
 if(('standalone' in window.navigator) && ((window.navigator as any)['standalone'])) document.documentElement.classList.add("standalone")
 ReactDOM.render(<App socket={io('/pizi-moins-de-neuf')}/>, document.getElementsByTagName("app")[0])
