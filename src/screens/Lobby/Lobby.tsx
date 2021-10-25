@@ -1,9 +1,9 @@
 import React, {Component } from 'react';
-import { GameModel } from '../GameBoard/GameModel';
-import {Table, Heading, Modal, AppScreenProps, Breakpoint} from 'pizi-react';
-import { ButtonGroup } from 'pizi-react/src/components/ButtonGroup/ButtonGroup';
-import { Button } from 'pizi-react/src/components/Button/Button';
+import { GameModel } from '../../models/GameModel';
+import {Table, Heading, AppScreenProps, Breakpoint, ButtonGroup, Button} from 'pizi-react';
 import { GameModal } from '../GameModal/GameModal';
+import { GameModalWarning } from '../GameModal/GameModalWarning';
+import memoizeOne from 'memoize-one';
 
 type LobbyState = {
     gameSelected: GameModel
@@ -33,6 +33,12 @@ export class Lobby extends Component<LobbyProps, LobbyState> {
         }
     }
 
+    memoizedPlayers = memoizeOne((games: GameModel[]) => games.map(game => [
+        game.getName(),
+        game.getPlayerModels().length + "/" + game.getConf().maxPlayer,
+        game.getAction() ? "En cours" : "En attente"
+    ]))
+
     componentDidMount(){
         this.props.socket.on("gameCreated", (game:any) =>  this.setState({displayGameInfo: false})) 
     }
@@ -57,6 +63,19 @@ export class Lobby extends Component<LobbyProps, LobbyState> {
         this.setState({gameSelected: null})
     }
 
+    shouldComponentUpdate(nextProps: LobbyProps, nextState: LobbyState){
+        if(nextState.gameSelected !== this.state.gameSelected 
+        || nextState.gameInfo !== this.state.gameInfo
+        || nextState.displayGameInfo !== this.state.displayGameInfo
+        || nextState.warningGameStarted !== this.state.warningGameStarted
+        || nextProps.breakpoint !== this.props.breakpoint
+        || nextProps.games !== this.props.games
+        || nextProps.currentGame !== this.props.currentGame){
+            return true
+        }
+        return false
+    }
+
     render(){
         return  <div className={"screen lobby"}>
                     <Heading tag="h1" appearance="simple" color="secondary">Parties</Heading>
@@ -64,14 +83,10 @@ export class Lobby extends Component<LobbyProps, LobbyState> {
                             color="secondary"
                             header={["Partie", "Joueurs", "Status"]}
                             staticHeader
-                            data={this.props.games.map(game => [
-                                game.getName(),
-                                game.getPlayerModels().length + "/" + game.getConf().maxPlayer,
-                                game.getAction() ? "En cours" : "En attente"
-                            ])}
+                            data={this.memoizedPlayers(this.props.games)}
                             onSelected={selected => this.setState({gameSelected: selected ? this.props.games.filter(game => game.getName() === selected[0])[0] : null})}
                             defaultOrder={{
-                                direction: 'up',
+                                direction: 'down',
                                 header: "Partie"
                             }}>
                     </Table>
@@ -90,22 +105,12 @@ export class Lobby extends Component<LobbyProps, LobbyState> {
                                 onClose={(gameData) => {
                                     gameData ? this.props.socket.emit("createGame", gameData) : this.setState({displayGameInfo: false})
                                 }}/>
-                    <Modal  className="warning-game-started"
-                            open={this.state.warningGameStarted === "asking"}
-                            color="main"
-                            appearance="simple"
-                            type="confirm"
-                            onClose={(action) => this.setState({warningGameStarted: action === "confirm" ? "accepted" : null})}
-                            onClosed={ () => {
-                                this.state.warningGameStarted === "accepted" && this.props.socket.emit("join", this.state.gameSelected.getName())
-                                this.setState({warningGameStarted: null})
-                            }}>
-                            <h3>Partie en cours!</h3>
-                            <p>Vous pouvez rejoindre en tant que spectateur.
-                            Une fois la manche terminée vous pourrez rejoindre la partie.
-                            </p>
-                            <p className="detail">(Votre score initial sera égal à la moyenne des scores des autres joueurs)</p>
-                    </Modal>
-                </div>
+                    <GameModalWarning   open={this.state.warningGameStarted === "asking"}
+                                        onClose={(action) => this.setState({warningGameStarted: action === "confirm" ? "accepted" : null})}
+                                        onClosed={() => {
+                                            this.state.warningGameStarted === "accepted" && this.props.socket.emit("join", this.state.gameSelected.getName())
+                                            this.setState({warningGameStarted: null})
+                                        }}/>
+            </div>
     }
 }

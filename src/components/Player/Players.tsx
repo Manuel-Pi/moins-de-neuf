@@ -1,5 +1,5 @@
 import React, { useState, useEffect, CSSProperties } from 'react';
-import {PlayerModel} from './PlayerModel';
+import {PlayerModel} from '../../models/PlayerModel';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Score } from './Score';
 
@@ -16,7 +16,7 @@ export const Players = ({ playerModels = [], className = "", currentPlayer, spec
                     <tbody>
                     {
                         playerModels.map( playerModel => 
-                            <tr className={"player " + className + (currentPlayer === playerModel.getName() ? " current" : "")}>
+                            <tr className={"player " + className + (currentPlayer === playerModel.getName() ? " current" : "")} key={playerModel.getName()}>
                                 <td>
                                     <span className="card-number">
                                         {playerModel.getCardNumber()}

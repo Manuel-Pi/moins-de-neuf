@@ -37,11 +37,11 @@ const addPlayer = (player, game) => {
 }
 
 const addSpectator = (player, game) => {
-    if(!player || !game) return;
+    if(!player || !game) return
 
     game.spectators = game.spectators || [];
-    if(game.spectators.filter(spectator => spectator.name === player.name).length) return;
-    game.spectators.push(player);
+    if(game.spectators.filter(spectator => spectator.name === player.name).length) return
+    game.spectators.push(player)
 }
 
 const getGames = (callback) => {
@@ -597,7 +597,7 @@ const getPublicPlayers = (players, games) => {
     return Object.entries(players).map(([name, player]) =>{
         return {
             name,
-            currentGame: getCurrentGameForPlayer(player, games) || null
+            game: getCurrentGameForPlayer(player, games) || null
         }
     });
 }

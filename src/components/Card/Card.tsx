@@ -1,5 +1,5 @@
 import React, { CSSProperties } from 'react';
-import {CardModel} from './CardModel';
+import {CardModel} from '../../models/CardModel';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 type CardProps = {
@@ -21,38 +21,38 @@ export const Card = ({ cardModel, onClick, style, className = "", ref = null }: 
     if(cardModel.isTurned()){
         value = cardModel.getValue();
         for(let i = 0; i < 4; i++){
-            values.push(<div className="value">
+            values.push(<div className="value" key={i}>
                             <span className={cardModel.getColor()}>{value}</span>
-                            {getColorIcon(cardModel.getColor())}
+                            {getColorIcon(cardModel.getColor(), "value-" + i)}
                         </div>
             );
         }
         if(cardModel.getIntValue() < 11 && cardModel.getIntValue()){
             for(let i = 0; i < cardModel.getIntValue(); i++){
-                symbols.push(getColorIcon(cardModel.getColor()));
+                symbols.push(getColorIcon(cardModel.getColor(), "symbol-" + i));
             }
         } else {
             switch(cardModel.getValue()){
                 case "J":
-                    symbols.push(<FontAwesomeIcon icon="graduation-cap" size="lg"  className={cardModel.getColor()}/>)
+                    symbols.push(<FontAwesomeIcon icon="graduation-cap" size="lg" key="jack" className={cardModel.getColor()}/>)
                     break;
 
                 case "Q":
-                    symbols.push(<FontAwesomeIcon icon="chess-queen" size="lg"  className={cardModel.getColor()}/>)
+                    symbols.push(<FontAwesomeIcon icon="chess-queen" size="lg" key="queen" className={cardModel.getColor()}/>)
                     break;
 
                 case "K":
-                    symbols.push(<FontAwesomeIcon icon="chess-king" size="lg" className={cardModel.getColor()}/>)
+                    symbols.push(<FontAwesomeIcon icon="chess-king" size="lg" key="king" className={cardModel.getColor()}/>)
                     break;
                 
                 case "*":
-                    symbols.push(<FontAwesomeIcon icon="cannabis" size="lg" className={cardModel.getColor()}/>)
+                    symbols.push(<FontAwesomeIcon icon="cannabis" size="lg" key="cannabis" className={cardModel.getColor()}/>)
                     break;
             }
             
         }
     } else {
-        symbols.push(<FontAwesomeIcon icon="carrot" size="lg"/>);
+        symbols.push(<FontAwesomeIcon icon="carrot" size="lg" key="carrot"/>);
     }
 
     return  <div ref={ref} className={cardModel.isTurned() ? "card turn " + className : "card notTurned " + className} onClick={onClick} style={style}>
@@ -63,10 +63,10 @@ export const Card = ({ cardModel, onClick, style, className = "", ref = null }: 
             </div>
 }
 
-const getColorIcon = (color: string) => {
+const getColorIcon = (color: string, key: any) => {
     switch(color){
         case "spade":
-            return <svg className="icon spade" viewBox="0 0 61.37698 65.616333">
+            return <svg className="icon spade" viewBox="0 0 61.37698 65.616333" key={"spade-" + key}>
                         <g
                         transform="translate(-118.23413,-111.57874)"
                         id="layer1">
@@ -82,7 +82,7 @@ const getColorIcon = (color: string) => {
                     </svg>
         
         case "heart":
-            return <svg className="icon heart" viewBox="0 0 63.448669 59.266666">
+            return <svg className="icon heart" viewBox="0 0 63.448669 59.266666" key={"heart-" + key}>
                         <g
                         transform="translate(-37.067331,47.020238)">
                         <path
@@ -96,7 +96,7 @@ const getColorIcon = (color: string) => {
                         </g>
                     </svg>
         case "club":
-            return <svg className="icon club" viewBox="0 0 63.503868 63.504364">
+            return <svg className="icon club" viewBox="0 0 63.503868 63.504364" key={"club-" + key}>
                     <g transform="translate(-74.081402,-116.41448)">
                     <path
                         style={{strokeWidth: 0}}
@@ -109,7 +109,7 @@ const getColorIcon = (color: string) => {
                     </g>
                 </svg>
         case "diamond":
-            return  <svg className="icon diamond" viewBox="0 0 63.499996 63.5">
+            return  <svg className="icon diamond" viewBox="0 0 63.499996 63.5" key={"diamond-" + key}>
                         <g
                         id="layer1"
                         transform="translate(-74.083333,-116.05747)"

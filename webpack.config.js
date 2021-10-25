@@ -1,21 +1,19 @@
-const webpack = require('webpack');
-const path = require('path');
-const CopyPlugin = require('copy-webpack-plugin');
-const MiniCssExtractPlugin = require('mini-css-extract-plugin');
-const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
+const path = require('path')
+const CopyPlugin = require('copy-webpack-plugin')
+const MiniCssExtractPlugin = require('mini-css-extract-plugin')
+const CssMinimizerPlugin = require('css-minimizer-webpack-plugin')
 
-module.exports = {
-    // Enable sourcemaps for debugging webpack's output.
-    //mode: "production",
-    mode: "development",
-    devtool: "eval-source-map",
+const config = {
+    mode: "production",
+    devtool: false,
 
     context: path.resolve(__dirname),
     
     output:{
         libraryTarget: 'umd',
         globalObject: 'this',
-        publicPath: '/moins-de-neuf-dev'
+        publicPath: '/moins-de-neuf/',
+        clean: true
     },
     
     resolve: {
@@ -90,42 +88,30 @@ module.exports = {
             ],
         }),
         new MiniCssExtractPlugin({
-            // Options similar to the same options in webpackOptions.output
-            // all options are optional
             filename: 'style.css',
             ignoreOrder: false, // Enable to remove warnings about conflicting order
         })
     ],
 
     optimization: {
-        minimize: false,
+        minimize: true,
         minimizer: [
             new CssMinimizerPlugin(),
             '...'
         ]
-    }
+    },
 
-    // When importing a module whose path matches one of the following, just
-    // assume a corresponding global variable exists and use that instead.
-    // This is important because it allows us to avoid bundling all of our
-    // dependencies, which allows browsers to cache those libraries between builds.
-/* externals: {
-        "react": "React",
-        "react-dom": "ReactDOM"
-    }*/
+    stats: {
+        chunkModules: true,
+        chunkOrigins: true
+    }
 }
 
-/*
 module.exports = (env, argv) => {
     if (argv.mode === 'development') {
         config.devtool = "eval-source-map"
         config.optimization.minimize = false
     }
-  
-    if (argv.mode === 'production') {
-
-    }
-  
     return config;
-}*/
+}
   

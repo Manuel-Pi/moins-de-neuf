@@ -1,6 +1,6 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
-import style from "./main.less";
+import "./main.less";
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faBan } from '@fortawesome/free-solid-svg-icons/faBan';
 import { faCheck } from '@fortawesome/free-solid-svg-icons/faCheck';
@@ -45,64 +45,65 @@ import { faUser } from "@fortawesome/free-solid-svg-icons/faUser";
 import { faUserNinja } from "@fortawesome/free-solid-svg-icons/faUserNinja";
 import { faUserSecret } from "@fortawesome/free-solid-svg-icons/faUserSecret";
 import { faListOl } from "@fortawesome/free-solid-svg-icons/faListOl";
-import { faChevronLeft, faChevronRight } from "@fortawesome/free-solid-svg-icons";
+import { faChevronLeft } from "@fortawesome/free-solid-svg-icons/faChevronLeft";
+import { faChevronRight } from "@fortawesome/free-solid-svg-icons/faChevronRight";
+import { faEdit } from "@fortawesome/free-solid-svg-icons/faEdit";
+import { faLongArrowAltDown } from "@fortawesome/free-solid-svg-icons/faLongArrowAltDown";
+import { faLongArrowAltUp } from "@fortawesome/free-solid-svg-icons/faLongArrowAltUp";
 // Add custom icon to Font Awesome
 library.add(faCheck, 
-            faGraduationCap, 
-            faCannabis, 
-            faChessQueen, 
-            faChessKing, 
-            faCarrot, 
-            faBars, 
-            faPaperPlane, 
-            faSpinner, 
-            faTrophy, 
-            faStar, 
-            faTimes, 
-            faKissWinkHeart, 
-            faReceipt,
-            faHandPaper,
-            faFileSignature,
-            faBullhorn,
-            faPlus,
-            faSignOutAlt,
-            faSignInAlt,
-            faMinus,
-            faPuzzlePiece,
-            faList,
-            faUsers,
-            faChartBar,
-            faUserCog,
-            faToggleOff,
-            faToggleOn,
-            faAngleRight,
-            faAngleLeft,
-            faInfo,
-            faPowerOff,
-            faRedo,
-            faFlagCheckered,
-            faBan,
-            faComment,
-            faPlay,
-            faStop,
-            faUser,
-            faUserNinja,
-            faUserSecret,
-            faListOl,
-            faChevronLeft,
-            faChevronRight);
-// Used for webpack to load less
-!!style;
-!!React;
-// Init Socket,io
+	    faGraduationCap, 
+	    faCannabis, 
+	    faChessQueen, 
+	    faChessKing, 
+	    faCarrot, 
+	    faBars, 
+	    faPaperPlane, 
+	    faSpinner, 
+	    faTrophy, 
+	    faStar, 
+	    faTimes, 
+	    faKissWinkHeart, 
+	    faReceipt,
+	    faHandPaper,
+	    faFileSignature,
+	    faBullhorn,
+	    faPlus,
+	    faSignOutAlt,
+	    faSignInAlt,
+	    faMinus,
+	    faPuzzlePiece,
+	    faList,
+	    faUsers,
+	    faChartBar,
+	    faUserCog,
+	    faToggleOff,
+	    faToggleOn,
+	    faAngleRight,
+	    faAngleLeft,
+	    faInfo,
+	    faPowerOff,
+	    faRedo,
+	    faFlagCheckered,
+	    faBan,
+	    faComment,
+	    faPlay,
+	    faStop,
+	    faUser,
+	    faUserNinja,
+	    faUserSecret,
+	    faListOl,
+	    faChevronLeft,
+	    faChevronRight,
+	    faEdit,
+	    faLongArrowAltDown,
+	    faLongArrowAltUp)
+
+// Declare window objects
 declare global {
-        interface Window {React: any, ReactDOM: any}
-        const io: any;
-        const PiziChat: any;
+	const io: any;
+	const PiziChat: any;
 }
-window.React = React;
-window.ReactDOM = ReactDOM;
-// Get Socket.io
-let socket = io('/pizi-moins-de-neuf');
-if(('standalone' in window.navigator) && (window.navigator['standalone'])) document.documentElement.classList.add("standalone");
-ReactDOM.render(<App socket={socket}/>, document.getElementsByTagName("app")[0]);
+// Check if it's a standolone navigator (phone web app)
+if(('standalone' in window.navigator) && ((window.navigator as any)['standalone'])) document.documentElement.classList.add("standalone")
+ReactDOM.render(<App socket={io('/pizi-moins-de-neuf')}/>, document.getElementsByTagName("app")[0])

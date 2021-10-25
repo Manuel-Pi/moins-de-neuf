@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef} from 'react';
 import {Card} from "../Card/Card";
-import { CardModel, Color } from '../Card/CardModel';
+import { CardModel, Color } from '../../models/CardModel';
 
 type HandProps = {
     cardModels?: CardModel[]

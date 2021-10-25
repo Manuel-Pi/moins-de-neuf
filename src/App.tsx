@@ -6,21 +6,12 @@ import { Players } from './screens/Players/Players'
 import { Account } from './screens/Account/Account'
 import { Rest } from './utils/Rest'
 import { Stats } from './screens/Stats/Stats'
-import { Modal, MenuApp, ClassNameHelper, debounce, throttle, onBreakpointChange } from 'pizi-react';
+import { Modal, MenuApp, ClassNameHelper, onBreakpointChange, Button } from 'pizi-react';
 import { Logo } from './components/Logo/Logo'
-import { globalHistory, navigate } from '@reach/router'
-import { GameModel } from './screens/GameBoard/GameModel'
-import { Button } from 'pizi-react/src/components/Button/Button'
-import { Breakpoint, GetBreakpoint } from 'pizi-react/src/utils/Utils'
-
-export enum SCREEN {
-    LOGIN,
-    LOBBY,
-    GAME,
-    PLAYERS,
-    ACCOUNT,
-    STATS
-}
+import { globalHistory } from '@reach/router'
+import { GameModel } from './models/GameModel'
+import { Breakpoint, GetBreakpoint } from 'pizi-react'
+import { PlayerJsonProps, PlayerModel } from './models/PlayerModel'
 
 type AppProps = {
     socket: any
@@ -29,12 +20,8 @@ type AppProps = {
 type AppState = {
     username: string
     games: GameModel[]
-    players: {
-        name: string,
-        currentGame: {name: string}
-    }[]
+    players: PlayerModel[]
     currentGame: GameModel
-    currentScreen: SCREEN
     piziChat: any
     userValid: boolean
     token: any
@@ -55,7 +42,6 @@ export class App extends Component<AppProps, AppState> {
             token: null,
             username: localStorage.getItem("username"),
             currentGame: null,
-            currentScreen: null,
             piziChat: null,
             userValid: false,
             modal: false,
@@ -75,7 +61,7 @@ export class App extends Component<AppProps, AppState> {
         // Try to reconnect
         this.props.socket.on("connect", () => {
             if(!this.state.username) return
-            this.state.username && this.props.socket.emit("reconnectUser", this.state.username, this.state.token)
+            this.props.socket.emit("reconnectUser", this.state.username, this.state.token)
         })
 
         // Connection accepted
@@ -84,7 +70,7 @@ export class App extends Component<AppProps, AppState> {
             const username = this.state.username
             if(!localStorage.getItem("token")) localStorage.setItem("username", username)
 
-            if(this.state.token) this.props.socket.emit("authenticate", username)
+            //if(this.state.token) this.props.socket.emit("authenticate", username)
 
             let piziChat = this.state.piziChat
             if(!piziChat && typeof PiziChat !== "undefined"){
@@ -99,18 +85,17 @@ export class App extends Component<AppProps, AppState> {
             })
         })
 
-        this.props.socket.on("setPlayers", (players:any) => {
-            this.setState({players})
+        this.props.socket.on("setPlayers", (players: PlayerJsonProps[]) => {
+            this.setState({players: players.map(player => new PlayerModel(player))})
         })
 
         this.props.socket.on("gameInfo", (game:any) => {
-            if(game) {
-                this.state.piziChat.join(game.name)
-                this.setState({
-                    currentGame: new GameModel(game),
-                    displayGame: true
-                })
-            }
+            if(!game) return
+            if(this.state.piziChat) this.state.piziChat.join(game.name)
+            this.setState({
+                currentGame: new GameModel(game),
+                displayGame: true
+            })
         })
 
         globalHistory.listen(({ action }) => {
@@ -154,7 +139,12 @@ export class App extends Component<AppProps, AppState> {
                         icon=""
                         path="login"
                         hideInMenu={true}
-                        socket={this.props.socket} onLogin={ (username, token) => this.props.socket.emit("login", username, token) && this.setState({username, token})} />
+                        socket={this.props.socket} 
+                        onLogin={(username, token) => {
+                            this.props.socket.emit("login", username, token)
+                            this.setState({username, token})
+                            localStorage.setItem("username", username)
+                        }} />
         }
 
         return  <>
@@ -181,12 +171,13 @@ export class App extends Component<AppProps, AppState> {
                             icon="users"
                             players={this.state.players}
                             socket={this.props.socket}
-                            className=""/>
+                            breakpoint={this.state.breakpoint}/>
                         <Stats title="STATS"
                             path="stats"
                             icon="chart-bar"
                             username={this.state.username} 
-                            token={this.state.token}/>
+                            token={this.state.token}
+                            breakpoint={this.state.breakpoint}/>
                         <Account title="COMPTE"
                             path="account"
                             icon="user-cog"
@@ -210,11 +201,10 @@ export class App extends Component<AppProps, AppState> {
                                         localStorage.removeItem("username")
                                         localStorage.removeItem("token")
                                     }
-                                    this.state.piziChat.leave(this.state.currentGame.getName())
+                                    if(this.state.currentGame && this.state.piziChat) this.state.piziChat.leave(this.state.currentGame.getName())
                                     this.setState({
                                         username: disconnectUser ? null : this.state.username,
-                                        currentGame: null,
-                                        currentScreen: disconnectUser ? SCREEN.LOGIN : this.state.currentScreen === SCREEN.GAME ? SCREEN.LOBBY : this.state.currentScreen,
+                                        currentGame: null
                                     })
                                     this.props.socket.emit("quit", disconnectUser)
                                 } 

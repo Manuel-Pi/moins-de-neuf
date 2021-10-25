@@ -1,7 +1,6 @@
-import { Modal, TextInput, NumberInput, ListInput, Switch, Table, Heading} from 'pizi-react';
-import React, { useState } from 'react';
-import {Tab} from 'pizi-react';
-import { GameInfo, GameModel } from '../GameBoard/GameModel';
+import { Modal, TextInput, NumberInput, ListInput, Switch, Table, Heading, Tab} from 'pizi-react';
+import React, { useEffect, useState } from 'react';
+import { GameInfo, GameModel } from '../../models/GameModel';
 import { Score } from '../../components/Player/Score';
 
 export interface GameModalProps {
@@ -36,15 +35,20 @@ export const GameModal: React.FC<GameModalProps & React.HTMLAttributes<HTMLDivEl
     fullScreen = false
 }) => {
 
-    const [gameInfo, setGameInfo] = useState(type === "info" && game ? game.getConf() : DEFAULT_GAME);
-    const [hasError, setHasError] = useState(false);
+    const [gameInfo, setGameInfo] = useState(type === "info" && game ? game.getConf() : DEFAULT_GAME)
+    const [hasError, setHasError] = useState(false)
+    const [modalKey, setModalKey] = useState(0)
     
-    const isInfo = type === "info";
+    const isInfo = type === "info"
 
     const updateGameInfo = (valueName: string) => (value: any) => setGameInfo((gameInfo) => ({
         ...gameInfo,
         [valueName]: value
     }))
+
+    useEffect(() => {
+        setGameInfo(type === "info" && game ? game.getConf() : DEFAULT_GAME)
+    }, [open])
 
     return  <Modal  open={open} 
                     appearance="simple"
@@ -53,6 +57,7 @@ export const GameModal: React.FC<GameModalProps & React.HTMLAttributes<HTMLDivEl
                     color="main"  
                     confirmButtonDisabled={() => hasError}
                     onClose={(action) => onClose(action === "confirm" ? gameInfo : null)}
+                    onClosed={() => setModalKey(modalKey + 1)}
                     header={!isInfo ? "Nouvelle Partie" : "Infos"}
                     fullScreen={fullScreen}>
                 <Tab title={"Général"} default>

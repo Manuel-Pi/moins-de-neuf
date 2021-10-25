@@ -1,11 +1,11 @@
 import React, { Component } from 'react';
 import {Hand} from "../../components/Hand/Hand";
-import { CardModel, CardParser } from '../../components/Card/CardModel';
+import { CardModel, CardParser } from '../../models/CardModel';
 import { Card } from '../../components/Card/Card';
-import { PlayerModel } from '../../components/Player/PlayerModel';
+import { PlayerModel } from '../../models/PlayerModel';
 import { Players } from '../../components/Player/Players';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { GameModel, CheckPlayedCards } from './GameModel';
+import { GameModel } from '../../models/GameModel';
 import { ClassNameHelper } from 'pizi-react';
 import { Score } from '../../components/Player/Score';
 import { Logo } from '../../components/Logo/Logo';

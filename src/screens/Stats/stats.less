@@ -1,104 +1,124 @@
 .stats{
+    padding-bottom: 4px;
 
-    canvas{
-        display: block;
-        box-sizing: border-box;
-        height: 443px;
-        width: 443.6px;
+    .pizi-tabs{
+        height: 100%;
+        overflow: auto;
+
+        .pizi-container{
+            padding: 0;
+            align-items: center;
+            position: relative;
+
+
+        }
     }
 
-    .user-screen, .users-screen{
-        display: none;
-    }
+    .users-stats{
+        .pizi-list-input{
+            margin-top: 1em;
+            margin-bottom: 1em;
+        }
 
-    &.user{
-        .user-screen{
-            display: block;
+        .pizi-table{
+            height: 100%;
+            //max-height: 400px;
 
-            .table{
-                height: 50px;
+            th{
+                width: 0;
+
+                &:nth-child(1){
+                    width: 100%;
+                }
+            }
+
+            .head-cell{
+                font-size: 0.8em;
+            }
+
+            td{
+                font-size: 1em;
+                text-align: center;
+                word-break: normal;
+
+                &:nth-child(1){
+                    text-align: left;
+                    font-size: 0.8em;
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    max-width: 0;
+                }
+
+                &:nth-child(2){
+                    font-size: 0.9em;
+                }
             }
         }
     }
 
-    &.users{
-        .users-screen{
-            display: block;
+    .user-screen{
+        position: relative;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+
+        .pizi-list-input{
+            margin-top: 1em;
+            margin-bottom: 0;
+        }
+
+        .pizi-table{
+            height: auto !important;
+
+            .head-cell{
+                font-size: 0.8em;
+            }
+        }
+
+        h4{
+            padding: 0;
         }
     }
 
-
-    .content{
+    .pizi-spinner{
+        height: 400px;
         width: 100%;
-        overflow: auto;
-    }
-    .text-input .placeholder, .password-input .placeholder{
-        color: #444;
+        position: absolute;
+        top: 0;
+        left: 0;
+        margin-top: 80px;
+
+        svg{
+            font-size: 4em;
+        }
+
+        label{
+            font-size: 1.8em;
+        }
     }
     
     canvas{
-        height: calc(100vw ~"-" 8px);
-        width: calc(100vw ~"-" 8px);
+        width: 100%;
         max-height: calc(500px ~"-" 8px);
         max-width: calc(500px ~"-" 8px);
         display: block;
         margin: 0 auto;
-        margin-bottom: 24px;
-        letter-spacing: 0.4px;
-    }
-
-    .table{
-        letter-spacing: 0.8px;
-
-        th{
-            font-size: 10px;
-            height: auto;
-        }
-        td{
-            font-size: 18px;
-        }
-
-        .body{
-            height: auto;
-        }
-
-        .header{
-            height: 22px;
-            border-bottom: 1px solid #222;
-        }
+        padding: 0 8px;
     }
 
     .stat1{
         display: inline-block;
         width: 100%;
         overflow: hidden;
-        letter-spacing: 1px;
-        margin-top: 16px;
 
         &:nth-child(3){
             width: 50%;
-            max-width: 150px;
         }
 
         &:nth-child(4){
             width: 50%;
-            max-width: 150px;
-        }
-
-        .placeholder{
-            font-weight: bold;
-            font-size: 16px;
-            color: #222;
-            
-        }
-
-        input{
-            border-bottom: none;
-            font-size: 18px;
-        }
-
-        + .stat1{
-            margin-top: 24px;
         }
     }
 
@@ -108,57 +128,7 @@
         justify-content: space-between;
         align-items: center;
         margin: 0 auto;
-        max-width: 320px;
     }
 
-    h1{
-        padding-bottom: 0px !important;
-        position: relative;
-    }
-
-    .options{
-        display: inline-flex;
-        justify-content: space-between;
-        align-items: center;
-        width: 70px;
-        margin-top: 16px;
-        float: right;
-
-        svg{
-            font-size: 22px;
-            opacity: 0.7;
-            cursor: pointer;
-
-            &:nth-child(2){
-                font-size: 25px;
-            }
-
-            &.selected{
-                transform: scale(1.5);
-                opacity: 1;
-            }
-        }
-    }
-
-    h2.title{
-        margin-top: 0px;
-        text-align: center;
-        width: 100%;
-        margin-top: 24px;
-        margin-bottom: 32px;
-
-        svg{
-            font-size: 32px;
-            margin-right: 8px;
-
-            &.fa-user{
-                font-size: 28px;
-            }
-        }
-    }
-
-    h4{
-        margin-bottom: 0px;
-        margin-top: 0px;
-    }
+    @import "stats-sm";
 }

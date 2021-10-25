@@ -1,22 +1,52 @@
 .account{
-
-    .content{
+    .pizi-container{
         width: 100%;
-        padding: 0.5rem;
+        height: 100%;
+    }
+
+    .pizi-button{
+        width: 100%;
+
+        &.change-password{
+            margin-top: auto;
+        }
+
+        &.error{
+            background-color: firebrick;
+            border-color: firebrick;
+            color: @color-white;
+        }
+
+        + .pizi-button{
+            margin-top: 4px;
+        }
+    }
+
+    :not(.pizi-input-container){
+        .pizi-button{
+            width: auto;
+        }
     }
 
     .pizi-input{
-        input{
-            width: 300px;
-        }
-        
+        margin-right: 0;
+        width: 100%;
 
-        & + .pizi-input{
-            margin-top: 12px;
+        input{
+            width: 100%;
         }
     }
 
-    .text-input .placeholder, .password-input .placeholder{
-        color: #444;
+    .pizi-modal-container{
+        width: 100%;
+
+        .password-needed{
+            padding: 0;
+            border: 0;
+            font-size: 0.8em;
+            color: @color-white;
+            margin-bottom: 0;
+            line-height: 1.2;
+        }
     }
 }

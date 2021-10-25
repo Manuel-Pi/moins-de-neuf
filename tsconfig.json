@@ -3,10 +3,11 @@
         "outDir": "./dist/",
         "sourceMap": true,
         "noImplicitAny": true,
-        "module": "commonjs",
+        "module": "esnext",
         "target": "es5",
         "jsx": "react",
-        "esModuleInterop": true
+        "esModuleInterop": true,
+        "moduleResolution": "node"
     },
     "includes": [
         "./path/to/the/new/file/externals.d.ts"
