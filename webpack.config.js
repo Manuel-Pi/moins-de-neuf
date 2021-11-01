@@ -101,10 +101,7 @@ const config = {
         ]
     },
 
-    stats: {
-        chunkModules: true,
-        chunkOrigins: true
-    }
+    stats: 'minimal'
 }
 
 module.exports = (env, argv) => {
@@ -112,6 +109,12 @@ module.exports = (env, argv) => {
         config.devtool = "eval-source-map"
         config.optimization.minimize = false
     }
-    return config;
+    if(argv.json){
+        config.stats = {
+            chunkModules: true,
+            chunkOrigins: true
+        }
+    }
+    return config
 }
   

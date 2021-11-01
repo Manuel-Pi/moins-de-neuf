@@ -1,6 +1,7 @@
 const path = require('path')
 const CopyPlugin = require('copy-webpack-plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
+const { AutomaticPrefetchPlugin } = require('webpack')
 
 module.exports = {
     // Enable sourcemaps for debugging webpack's output.
@@ -35,7 +36,6 @@ module.exports = {
                     }
                 ]
             },
-            // All output '.js' files will have any sourcemaps re-processed by 'source-map-loader'.
             {
                 enforce: "pre",
                 test: /\.js$/,
@@ -90,6 +90,13 @@ module.exports = {
 
     optimization: {
         minimize: true
+    },
+    
+    stats: {
+        all: false,
+        errors: true,
+        errorDetails: "auto",
+        builtAt: true
     }
 }
   

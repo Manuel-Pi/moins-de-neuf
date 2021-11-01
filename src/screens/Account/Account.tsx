@@ -1,17 +1,10 @@
 import { AppScreenProps, Heading, Modal, TextInput } from 'pizi-react';
-import React, {Component, useEffect, useReducer, useState } from 'react';
-import { Rest } from '../../utils/Rest';
+import React, {useEffect, useState } from 'react';
+import { PiziToken, PiziUsers } from '../../utils/PiziServer';
 import { ClassNameHelper } from 'pizi-react';
 import { UserProps } from '../../models/UserModel';
 import { Button } from 'pizi-react/src/components/Controls/Button/Button';
-import { ValidationRegExp } from 'pizi-react/src/components/Inputs/TextInput/TextInput';
-
-interface AccountState {
-    user: {
-        login: string,
-        role: string
-    }
-}
+import { InputValidation } from 'pizi-react/src/components/Inputs/TextInput/TextInput';
 
 interface AccountProps extends AppScreenProps {
     token: any
@@ -22,13 +15,14 @@ type FieldData = {
     value: string
     label: string
     regex: RegExp
+    validationMessage: string
     needPassword: boolean
     needEmailCode: boolean
     password: string
     emailCode: string
 }
 
-type EditedFieldValues = "email" | "login" | "password"
+type EditedFieldValues = "email" | "login" | "password" | "delete"
 
 export const Account: React.FC<AccountProps> = ({
     token = null
@@ -40,6 +34,7 @@ export const Account: React.FC<AccountProps> = ({
         label: "",
         regex: null,
         needPassword: false,
+        validationMessage: null
     } as FieldData
 
     const[user, setUser]: [UserProps, (user: UserProps) => void] = useState(null)
@@ -47,9 +42,10 @@ export const Account: React.FC<AccountProps> = ({
     const[displayEmailCodeField, setDisplayEmailCodeField] = useState(false)
     const[emailCode, setEmailCode] = useState(null)
     const[displayPasswordField, setDisplayPasswordField] = useState(false)
-    const[password, setPassword] = useState(false)
+    const[checkPassword, setCheckPassword] = useState("")
     const[editedField, setEditedField] = useState(null as EditedFieldValues)
     const[fieldData, setFieldData] = useState(DEFAULT_FIELD_DATA)
+    const[wrongCode, setWrongCode] = useState(false)
 
     useEffect(() => {
         switch (editedField) {
@@ -58,7 +54,8 @@ export const Account: React.FC<AccountProps> = ({
                     initialValue: user.email,
                     value: user.email,
                     label: "Nouvel email",
-                    regex:  ValidationRegExp.email,
+                    regex:  InputValidation.email.regex,
+                    validationMessage: InputValidation.email.message,
                     needPassword: true,
                     needEmailCode: true,
                     password: "",
@@ -71,7 +68,8 @@ export const Account: React.FC<AccountProps> = ({
                     initialValue: user.login,
                     value: user.login,
                     label: "Nouveau login",
-                    regex:  ValidationRegExp.text,
+                    regex:  InputValidation.text.regex,
+                    validationMessage: InputValidation.text.message,
                     needPassword: true,
                     needEmailCode: false,
                     password: "",
@@ -84,7 +82,22 @@ export const Account: React.FC<AccountProps> = ({
                     initialValue: "",
                     value: "",
                     label: "Nouveau mot de passe",
-                    regex:  ValidationRegExp.text,
+                    regex:  InputValidation.password.regex,
+                    validationMessage: InputValidation.password.message,
+                    needPassword: true,
+                    needEmailCode: false,
+                    password: "",
+                    emailCode: ""
+                })
+                break
+
+            case "delete":
+                setFieldData({
+                    initialValue: "delete",
+                    value: "",
+                    label: "",
+                    regex:  null,
+                    validationMessage: null,
                     needPassword: true,
                     needEmailCode: false,
                     password: "",
@@ -98,10 +111,10 @@ export const Account: React.FC<AccountProps> = ({
     },[editedField])
 
     useEffect(() => {
-        if(token) Rest.get('users/' + token.user).then(setUser).catch(rep => {
-            console.log("error")
+        if(token) PiziUsers.getUser(token.user).then(setUser).catch(rep => {
+            console.log("cannot get user!", rep)
         })
-    },[])
+    },[token])
 
     return  <div className={ClassNameHelper("screen account")}>
                 <Heading tag="h1" appearance="simple" color="secondary">Compte</Heading>
@@ -123,34 +136,58 @@ export const Account: React.FC<AccountProps> = ({
                         <Button icon="edit" appearance="fill" color="secondary" onClick={() => setEditedField("email")}/>
                     </div>
                     <Button color="secondary" className="change-password" onClick={() => setEditedField("password")}>Changer le mot de passe</Button>
-                    <Button color="error">Supprimer le compte</Button>
+                    <Button color="error" onClick={() => {
+                                                            setEditedField("delete")
+                                                            setDisplayPasswordField(true)
+                                                        }}>Supprimer le compte</Button>
                 </div>
                 <Modal  type="confirm" 
                         open={!!editedField}
                         header="Édition"
                         color="secondary"
                         onClose={action => {
-                            if(error) return false
                             if(action === "confirm" && fieldData.value !== fieldData.initialValue){
+                                if(error) return false
                                 if(fieldData.needPassword && !displayPasswordField){
                                     setDisplayPasswordField(true)
                                     return false
                                 }
                                 if(fieldData.needEmailCode && !displayEmailCodeField){
-                                    setDisplayEmailCodeField(true)
-                                    return false
+                                    // Update user
+                                    PiziUsers.updateUser(user.login, {[editedField]: fieldData.value, checkPassword}).then(param => {
+                                        setDisplayEmailCodeField(true)
+                                    }).catch(err => console.log("cannot send email"))
+                                    return 
                                 }
+                                if(editedField === "delete"){
+                                    PiziUsers.deleteUser(user.login, {checkPassword}).then(() => location.reload())
+                                } else {
+                                    // Update user
+                                    PiziUsers.updateUser(user.login, {[editedField]: fieldData.value, checkPassword, checkCode: emailCode}).then(param => {
+                                        // Refresh token and page if login changed
+                                        if(editedField === "login"){
+                                            PiziToken.getToken(fieldData.value, checkPassword).then(() => location.reload())
+                                        } else location.reload()
+                                    }).catch(error => {})
+                                }
+                                return
                             }
                             setEditedField(null) 
+                            setCheckPassword(null)
+                            setFieldData(DEFAULT_FIELD_DATA)
                         }}
                         onClosed={() => {
                             setDisplayEmailCodeField(false)
                             setDisplayPasswordField(false)
+                            setEditedField(null) 
+                            setCheckPassword(null)
                             setFieldData(DEFAULT_FIELD_DATA)
                         }}>
-                        <TextInput  label={fieldData.label} 
+                        <TextInput  display={!!fieldData.label}
+                                    label={fieldData.label} 
                                     defaultValue={fieldData.value}
                                     valdationRegex={fieldData.regex}
+                                    valdationMessage={fieldData.validationMessage}
                                     onError={setError}
                                     readOnly={displayPasswordField || displayEmailCodeField}
                                     onChange={value => setFieldData({...fieldData, value})}/>
@@ -161,9 +198,14 @@ export const Account: React.FC<AccountProps> = ({
                         <TextInput  label="Mot de passe"
                                     type="password"
                                     display={displayPasswordField}
-                                    onChange={password => setFieldData({...fieldData, password})}/>
+                                    onError={setError}
+                                    onChange={setCheckPassword}/>
                         <TextInput label="Code de vérification envoyé par email"
-                                   valdationRegex={/\d{6}/}
+                                   valdationRegex={/^\d{6}$/}
+                                   valdationMessage="6 chiffres seulement"
+                                   error={wrongCode ? "Code incorrect!" : null}
+                                   onError={setError}
+                                   onChange={setEmailCode}
                                    display={displayEmailCodeField}/>
                 </Modal>
             </div>

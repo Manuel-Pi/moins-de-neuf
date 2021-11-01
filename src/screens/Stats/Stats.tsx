@@ -1,5 +1,5 @@
 import React, {Component} from 'react'
-import { Rest } from '../../utils/Rest'
+import { PiziRest } from '../../utils/PiziServer'
 import { PlayerModel } from '../../models/PlayerModel'
 import { AppScreenProps, Heading, Table, Tabs, Tab, Breakpoint, ListInput } from 'pizi-react'
 import { StatChart } from './StatChart'
@@ -29,7 +29,7 @@ export class Stats extends Component<StatsProps, StatsState> {
     }
 
     componentDidMount(){
-        Rest.get("/players").then(json => {
+        PiziRest.get("players").then(json => {
             if(json.message || !(json instanceof Array)) return
             const players = json.map((player: any) => new PlayerModel({stats: player.stats, name: player.user}))
             players.sort((p1, p2) => p2.getStats().games.won - p1.getStats().games.won)

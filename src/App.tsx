@@ -4,9 +4,9 @@ import { Lobby } from './screens/Lobby/Lobby'
 import { GameBoard } from './screens/GameBoard/GameBoard'
 import { Players } from './screens/Players/Players'
 import { Account } from './screens/Account/Account'
-import { Rest } from './utils/Rest'
+import { PiziToken } from './utils/PiziServer'
 import { Stats } from './screens/Stats/Stats'
-import { Modal, MenuApp, ClassNameHelper, onBreakpointChange, Button } from 'pizi-react';
+import { Modal, MenuApp, ClassNameHelper, onBreakpointChange, Button } from 'pizi-react'
 import { Logo } from './components/Logo/Logo'
 import { globalHistory } from '@reach/router'
 import { GameModel } from './models/GameModel'
@@ -55,9 +55,9 @@ export class App extends Component<AppProps, AppState> {
     }
 
     componentDidMount(){
-        if(localStorage.getItem("token")) Rest.checkToken().then((token:any) => this.setState({username: token.user, token}, () => {
+        if(localStorage.getItem("token")) PiziToken.checkToken().then((token:any) => this.setState({username: token.user, token}, () => {
             this.props.socket.emit("reconnectUser", token.user, token)
-        }))
+        })).catch(error => PiziToken.clearToken())
         // Try to reconnect
         this.props.socket.on("connect", () => {
             if(!this.state.username) return
@@ -135,16 +135,12 @@ export class App extends Component<AppProps, AppState> {
     render(){
         if(!this.state.username){
             if(this.state.piziChat) this.state.piziChat.toggleChat("hide")
-            return  <Login title="LOGIN"
-                        icon=""
-                        path="login"
-                        hideInMenu={true}
-                        socket={this.props.socket} 
-                        onLogin={(username, token) => {
-                            this.props.socket.emit("login", username, token)
-                            this.setState({username, token})
-                            localStorage.setItem("username", username)
-                        }} />
+            return  <Login  breakpoint={this.state.breakpoint}
+                            onLogin={(username, token) => {
+                                if(!token) localStorage.setItem("username", username)
+                                this.props.socket.emit("login", username, token)
+                                this.setState({username, token})
+                            }}/>
         }
 
         return  <>

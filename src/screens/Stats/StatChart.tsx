@@ -49,8 +49,8 @@ export const StatChart: React.FC<StatChartProps & React.HTMLAttributes<HTMLDivEl
 
     useEffect(() => {
         if(!canevaRef.current) return
-        import(/* webpackChunkName: "chartjs" */'chart.js').then(({Chart, RadialLinearScale, RadarController, PointElement, LineElement}) => {
-            Chart.register(RadarController, RadialLinearScale, PointElement, LineElement)
+        import(/* webpackChunkName: "chartjs" */'chart.js').then(({Chart, RadialLinearScale, RadarController, PointElement, LineElement, Filler}) => {
+            Chart.register(RadarController, RadialLinearScale, PointElement, LineElement, Filler)
             setChart(new Chart(canevaRef.current.getContext('2d'), {
                 type: 'radar',
                 data: {
