@@ -1,10 +1,21 @@
+/********************************************************
+ * Pizi Server Utils
+ * -----------------
+ * 
+ * Utility functions used to interact with Pizi Server 
+ * 
+ ********************************************************/
+
+/* Current TOKEN */
 let TOKEN: any = null;
 
+/* Get TOKEN from client */
 const getAuthorization = () => {
-    TOKEN = TOKEN || JSON.parse(localStorage.getItem("token")) || null;
+    TOKEN = TOKEN || JSON.parse(localStorage.getItem("token")) || null
     return (TOKEN && TOKEN.jwt) ? "Bearer " + TOKEN.jwt : null
 }
 
+/* Basic request with authentification */
 const basicRequest = (url: string, options: any = {}) => {
     // Add token if exist
     const authToken = getAuthorization()
@@ -55,33 +66,21 @@ export const PiziRest = {
 
 export const PiziToken = {
     // TOKEN utilities
-    getToken(login: string, password: string){
+    getToken(login?: string, password?: string){
         return PiziRest.get("/token", {
-            headers: {login, password}
+            headers: login && password ? {login, password} : {}
         }).then((token: any) => {
-            if(token && token.jwt){
-                TOKEN = token;
+            if(token.message) this.clearToken()
+            else if(token && token.jwt){
+                TOKEN = token
                 localStorage.setItem("token", JSON.stringify(TOKEN))
             }
             return token
         }).catch((error:any) => console.error(error))
     },
-    checkToken(){
-        TOKEN = TOKEN || JSON.parse(localStorage.getItem("token")) || null;
-        return PiziRest.get("/check").then((response:any) => {
-            if(!response) return
-            if(response.message){
-                this.clearToken()
-            } else {
-                TOKEN = response;
-                localStorage.setItem("token", JSON.stringify(TOKEN))
-                return TOKEN
-            }
-        })
-    },
     clearToken(){
-        TOKEN = {};
-        localStorage.removeItem("token");
+        TOKEN = {}
+        localStorage.removeItem("token")
     }
 }
 
@@ -97,6 +96,9 @@ export const PiziUsers = {
     },
     deleteUser(login: string, userProps: {checkPassword: string}){
         return PiziRest.delete("/pizi-users/deleteUser/" + login, userProps)
+    },
+    resetPassword(userProps: {login?: string, password?: string, email?: string, checkCode?: string, urlCode?: string}){
+        return PiziRest.post("/pizi-users/reset-password" , userProps)
     }
 }
 

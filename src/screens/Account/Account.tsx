@@ -1,13 +1,16 @@
-import { AppScreenProps, Heading, Modal, TextInput } from 'pizi-react';
+import { AppScreenProps, Breakpoint, Heading, Modal, TextInput } from 'pizi-react';
 import React, {useEffect, useState } from 'react';
 import { PiziToken, PiziUsers } from '../../utils/PiziServer';
 import { ClassNameHelper } from 'pizi-react';
 import { UserProps } from '../../models/UserModel';
 import { Button } from 'pizi-react/src/components/Controls/Button/Button';
 import { InputValidation } from 'pizi-react/src/components/Inputs/TextInput/TextInput';
+import { CreateAccountModal } from '../Login/CreateAccount';
 
 interface AccountProps extends AppScreenProps {
     token: any
+    username: string
+    breakpoint: Breakpoint
 }
 
 type FieldData = {
@@ -25,7 +28,9 @@ type FieldData = {
 type EditedFieldValues = "email" | "login" | "password" | "delete"
 
 export const Account: React.FC<AccountProps> = ({
-    token = null
+    token = null,
+    username = "",
+    breakpoint
 }) => {
 
     const DEFAULT_FIELD_DATA = {
@@ -46,6 +51,9 @@ export const Account: React.FC<AccountProps> = ({
     const[editedField, setEditedField] = useState(null as EditedFieldValues)
     const[fieldData, setFieldData] = useState(DEFAULT_FIELD_DATA)
     const[wrongCode, setWrongCode] = useState(false)
+    const[showCreate, setShowCreate] = useState(!token)
+
+    useEffect(() => setShowCreate(!token), [token])
 
     useEffect(() => {
         switch (editedField) {
@@ -125,7 +133,7 @@ export const Account: React.FC<AccountProps> = ({
                                     defaultValue={user?.login}
                                     readOnly
                                     appearance="alt"/>
-                        <Button icon="edit" appearance="fill" color="secondary" onClick={() => setEditedField("login")}/>
+                        <Button disabled={!token} icon="edit" appearance="fill" color="secondary" onClick={() => setEditedField("login")}/>
                     </div>
                     <div className="pizi-input-container">
                         <TextInput  label={"Email"}
@@ -133,10 +141,10 @@ export const Account: React.FC<AccountProps> = ({
                                     defaultValue={user?.email}
                                     readOnly
                                     appearance="alt"/>
-                        <Button icon="edit" appearance="fill" color="secondary" onClick={() => setEditedField("email")}/>
+                        <Button disabled={!token} icon="edit" appearance="fill" color="secondary" onClick={() => setEditedField("email")}/>
                     </div>
-                    <Button color="secondary" className="change-password" onClick={() => setEditedField("password")}>Changer le mot de passe</Button>
-                    <Button color="error" onClick={() => {
+                    <Button disabled={!token} color="secondary" className="change-password" onClick={() => setEditedField("password")}>Changer le mot de passe</Button>
+                    <Button disabled={!token} color="error" onClick={() => {
                                                             setEditedField("delete")
                                                             setDisplayPasswordField(true)
                                                         }}>Supprimer le compte</Button>
@@ -208,5 +216,10 @@ export const Account: React.FC<AccountProps> = ({
                                    onChange={setEmailCode}
                                    display={displayEmailCodeField}/>
                 </Modal>
+                <CreateAccountModal open={showCreate} 
+                                    onCreated={ () => location.reload()} 
+                                    login={username} 
+                                    fullScreen={breakpoint === "xs"}
+                                    onClose={action => action === "cancel" ? setShowCreate(false) : ""}/>
             </div>
 }

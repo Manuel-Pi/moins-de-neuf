@@ -55,13 +55,12 @@ export class App extends Component<AppProps, AppState> {
     }
 
     componentDidMount(){
-        if(localStorage.getItem("token")) PiziToken.checkToken().then((token:any) => this.setState({username: token.user, token}, () => {
+        if(localStorage.getItem("token")) PiziToken.getToken().then((token:any) => this.setState({username: token.user, token}, () => {
             this.props.socket.emit("reconnectUser", token.user, token)
         })).catch(error => PiziToken.clearToken())
         // Try to reconnect
         this.props.socket.on("connect", () => {
-            if(!this.state.username) return
-            this.props.socket.emit("reconnectUser", this.state.username, this.state.token)
+            if(this.state.username) this.props.socket.emit("reconnectUser", this.state.username, this.state.token)
         })
 
         // Connection accepted
@@ -177,7 +176,9 @@ export class App extends Component<AppProps, AppState> {
                         <Account title="COMPTE"
                             path="account"
                             icon="user-cog"
-                            token={this.state.token}/>
+                            username={this.state.username} 
+                            token={this.state.token}
+                            breakpoint={this.state.breakpoint}/>
                     </MenuApp>
                     <GameBoard className={ClassNameHelper({hidden: !this.state.displayGame})}
                             socket={this.props.socket} 

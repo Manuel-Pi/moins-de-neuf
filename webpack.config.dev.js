@@ -1,14 +1,22 @@
+const _require = id => require(require.resolve(id, { paths: [require.main.path] }))
+const webpack = _require('webpack')
 const path = require('path')
 const CopyPlugin = require('copy-webpack-plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
-const { AutomaticPrefetchPlugin } = require('webpack')
+const ReactRefreshTypeScript = require('react-refresh-typescript').default
+const ReactRefreshWebpackPlugin = require('@pmmmwh/react-refresh-webpack-plugin')
 
 module.exports = {
     // Enable sourcemaps for debugging webpack's output.
-    mode: "production",
+    mode: "development",
     devtool: "eval-source-map",
 
     context: path.resolve(__dirname),
+
+    entry: [
+        "./src/index.tsx",
+        path.join(require.main.path, 'node_modules/webpack-hot-middleware/client')
+    ],
     
     output:{
         libraryTarget: 'umd',
@@ -27,6 +35,22 @@ module.exports = {
         rules: [
             {
                 test: /\.ts(x?)$/,
+                exclude: /node_modules/,
+                use: [
+                    {
+                        loader: "ts-loader",
+                        options: {
+                            allowTsInNodeModules: true,
+                            getCustomTransformers: () => ({
+                                before: [ReactRefreshTypeScript()]
+                            }),
+                            transpileOnly: true
+                        }
+                    }
+                ]
+            },
+            {
+                test: /node_modules.*\.ts(x?)$/,
                 use: [
                     {
                         loader: "ts-loader",
@@ -85,6 +109,13 @@ module.exports = {
         new MiniCssExtractPlugin({
             filename: 'style.css',
             ignoreOrder: false, // Enable to remove warnings about conflicting order
+        }),
+        new webpack.HotModuleReplacementPlugin(),
+        new webpack.NoEmitOnErrorsPlugin(),
+        new ReactRefreshWebpackPlugin({
+            overlay: {
+                sockIntegration: "whm"
+            }
         })
     ],
 

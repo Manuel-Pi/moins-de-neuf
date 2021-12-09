@@ -61,7 +61,7 @@ const getGames = (callback) => {
 }
 
 const saveGame = (game, saveStats = false) => {
-    if(mongoose.connection.readyState === 1&& game && game.name){
+    if(mongoose.connection.readyState === 1 && game && game.name){
         GameModel.findOneAndUpdate({name: game.name}, game, {upsert: true}, oldValue => {});
 
         if(game.gameEnd && saveStats){

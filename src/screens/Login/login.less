@@ -16,16 +16,12 @@
         @media (max-width: @breakpoint-xs){
             width: 280px;
         }
-
-        svg g{
-            fill: @color-secondary;
-        }
     }
     
     .inputs{
         display: flex;
-        justify-content: center;
-        align-items: center;
+        justify-content: space-between;;
+        align-items: flex-start;
         width: 280px;
 
         .placeholder{
@@ -49,32 +45,35 @@
             color: #222;
         }
 
-        .password-input{
+        > .pizi-input{
+            .pizi-text-input__input input{
+                width: 200px;
+            }
+
+            .pizi-input__error.error{
+                color: white;
+                display: block;
+            }
+        }
+
+        > .pizi-input:nth-child(2){
             display: none;
             margin-top: 0 !important;
         }
 
+        > .pizi-button{
+            margin-top: 1.4em;
+        }
+
         &.user-valid{
 
-            .password-input{
+            > .pizi-input:nth-child(2){
                 display: block;
             }
     
-            .text-input{
+            > .pizi-input:nth-child(1){
                 display: none;
             }
-        }
-    }
-
-    p{
-        padding: 0;
-        border: 0;
-        font-size: 1.2em;
-        color: @color-white;
-        line-height: 1.2;
-
-        .username{
-            color: @color-main;
         }
     }
 }

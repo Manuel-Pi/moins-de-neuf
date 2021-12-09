@@ -15,6 +15,7 @@
   "author": "Manuel-Pi",
   "license": "ISC",
   "devDependencies": {
+    "@pmmmwh/react-refresh-webpack-plugin": "^0.5.3",
     "@types/chart.js": "^2.9.34",
     "@types/react": "^17.0.32",
     "@types/react-dom": "^17.0.10",
@@ -26,6 +27,8 @@
     "less": "^4.1.2",
     "less-loader": "^10.2.0",
     "mini-css-extract-plugin": "^2.4.3",
+    "react-refresh": "^0.11.0",
+    "react-refresh-typescript": "^2.0.3",
     "source-map-loader": "^3.0.0",
     "style-loader": "^3.3.1",
     "ts-loader": "^9.2.6",
