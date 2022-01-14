@@ -1,0 +1,44 @@
+#victoire: ratio victoire
+won
+lost
+
+----->
+victory = ratio
+total
+ratio
+
+#reactivité (quickplay): ratio quickplay
+done
+taken
+
+----->
+reactivity = ratio
+total
+ratio
+
+
+#régularité: ratio moinsdeneuf
+won
+lost
+
+----->
+regularity = ratio
+total
+ratio
+
+#statégie: ratio moinsdeneuf
+won
+lost
+
+----->
+regularity = ratio
+total
+ratio
+
+#style: nombre moinsdeneuf par partie + nombre de quickplay par partie 
+
+----->
+style = moinsdeneuf.won + quickplay.won / game.total 
+
+
+Le graph représente un niveau comparé aux autres joueurs

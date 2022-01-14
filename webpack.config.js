@@ -49,9 +49,6 @@ const config = {
                 use: [
                     {
                         loader: MiniCssExtractPlugin.loader,
-                        options: {
-          
-                        },
                       },
                     "css-loader",
                     "less-loader"
@@ -61,11 +58,8 @@ const config = {
                 test: /node_modules.*\.less$/,
                 use: [
                     {
-                        loader: MiniCssExtractPlugin.loader,
-                        options: {
-           
-                        },
-                      },
+                        loader: MiniCssExtractPlugin.loader
+                    },
                     "css-loader",
                     "less-loader"
                 ]

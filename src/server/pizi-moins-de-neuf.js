@@ -2,6 +2,7 @@ const CardManager = require('./pizi-moins-de-neuf-gameManager.js');
 const CardGame = require('./pizi-card-game');
 const mongoose = require('mongoose');
 const ioClient = require('socket.io-client');
+const PlayerModel = require('./database/models/player');
 
 module.exports = function({socketServer, console, host}){
     // Get io for a specific namespace
@@ -25,8 +26,9 @@ module.exports = function({socketServer, console, host}){
                     allowedUsers: game.players.filter(player => !player.bot).map(player => player.name)
                 })
             })
-        });
-    });
+        })
+        CardManager.getDBPlayers(players => Object.keys(players).forEach(name => addPlayer(null, name)))
+    })
 
     io.on('connection', function (socket) {
         console.debug("connection of " + socket.id);
@@ -353,15 +355,25 @@ module.exports = function({socketServer, console, host}){
         return player ? [game, player] : [];
     }
 
-    function login(socket, username, token){
+    function addPlayer(socket, name){
+        if(!name) return
+        PlayerModel.find({user: name}, (err, playerModels) => {
+            if(err) console.error(JSON.stringify(err));
+            else {
+                PLAYERS[name] = {
+                    id: socket ? socket.id : null,
+                    name,
+                    isDBUser: playerModels.length > 0
+                }
+                if(socket) socket.player = name
+            }
+        })
+    }
+
+    function login(socket, username){
         if(!username) return
 
-        PLAYERS[username] = {
-            id: socket.id,
-            name: username
-        }
-        
-        socket.player = username;
+        addPlayer(socket, username)
         console.info('Connection: ' + username)
 
         // Retrieve current game 
@@ -390,7 +402,7 @@ module.exports = function({socketServer, console, host}){
             playForBot(currentGame.game, socket)
         }
 
-        cleanPlayerFromTimeout(username);
+        cleanPlayerFromTimeout(username)
     }
 
     function cleanPlayerFromTimeout(username){

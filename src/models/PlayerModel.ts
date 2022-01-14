@@ -1,5 +1,6 @@
 import { CardModel, CardJsonProps } from "./CardModel"
 import { GameJsonProps, GameModel } from "./GameModel"
+import { PlayerStats } from "./PlayerStatsModel"
 
 type PlayerStatus = "connected" | "disconnected" | "inGame"
 
@@ -15,29 +16,6 @@ export type PlayerJsonProps = {
     stats?: any
     bot?: boolean
 } 
-
-export type PlayerStats = {
-    games: {
-        won: number,
-        lost: number,
-        played: number,
-        ratio: number
-    },
-    moinsdeneuf: {
-        call: number,
-        won: number,
-        lost: number,
-        ratio: number
-    },
-    quickplay: {
-        done: number,
-        taken: number
-    },
-    score: {
-        min: number,
-        max: number
-    }
-}
 
 export class PlayerModel{
     static idIndex = 0
@@ -113,5 +91,17 @@ export class PlayerModel{
     public getStatus():PlayerStatus {
         if(this.game) return "inGame"
         return this.status
+    }
+
+    public getReactivity():number {
+        let reactivity = 0
+        if(this.stats.quickplay) reactivity = this.stats.quickplay.done / this.stats.quickplay.taken
+        return reactivity
+    }
+
+    public getVictory():number {
+        let reactivity = 0
+        if(this.stats.quickplay) reactivity = this.stats.quickplay.done / this.stats.quickplay.taken
+        return reactivity
     }
 }

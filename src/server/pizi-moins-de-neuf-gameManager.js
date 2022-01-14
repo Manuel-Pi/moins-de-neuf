@@ -1,13 +1,10 @@
 const CardGame = require('./pizi-card-game');
 const mongoose = require('mongoose');
 const GameModel = require('./database/models/game');
-const PlayerModel = require('./database/models/player');
-
+const PlayerModel = require('./database/models/player')
 const addPlayer = (player, game) => {
-    if(!player || !game) return;
-
-    const startScore = game.round ? Math.round(game.players.reduce((total, player) => total + player.score, 0) / game.players.length): 0;
-
+    if(!player || !game) return
+    const startScore = game.round ? Math.round(game.players.reduce((total, player) => total + player.score, 0) / game.players.length): 0
     game.players.push({
         ...player,
         score: startScore,
@@ -30,10 +27,8 @@ const addPlayer = (player, game) => {
                 taken: 0
             }
         }
-    });
-
-    game.lastTime = (new Date()).getTime();
-
+    })
+    game.lastTime = (new Date()).getTime()
 }
 
 const addSpectator = (player, game) => {
@@ -60,22 +55,33 @@ const getGames = (callback) => {
     }
 }
 
+const getDBPlayers = (callback) => {
+    let players = {}
+    if(mongoose.connection.readyState === 1){
+        // Check for db
+        PlayerModel.find({}, (err, playerModels) => {
+            if(err) console.error(JSON.stringify(err));
+            playerModels.forEach(player => players[player.user] = player)
+            callback(players)
+        });
+    } else callback(players)
+}
+
 const saveGame = (game, saveStats = false) => {
     if(mongoose.connection.readyState === 1 && game && game.name){
-        GameModel.findOneAndUpdate({name: game.name}, game, {upsert: true}, oldValue => {});
+        GameModel.findOneAndUpdate({name: game.name}, game, {upsert: true}, oldValue => {})
 
         if(game.gameEnd && saveStats){
             game.players.forEach(player => {
                 // Save Stats
                 PlayerModel.findOne({user: player.name}, (err, model) => {
-                    if(err) console.error(JSON.stringify(err));
-                    if(!model){
-                        model = new PlayerModel({user: player.name});
-                    }
-                    model.updateStats(player.stats);
-                    model.save();
-                });
-            });
+                    if(err) console.error(JSON.stringify(err))
+                    if(!player.isDBUser) return
+                    if(!model) model = new PlayerModel({user: player.name})
+                    model.updateStats(player.stats)
+                    model.save()
+                })
+            })
         }
         if(game.gameEnd){
             game.gameEnd
@@ -127,8 +133,7 @@ const createGame = (games, gameData = {}, force = false) => {
         quikPlay: false,
         conf: gameData,
         gameEnd: null
-    };
-
+    }
     let botNames = ["Manu", "Fab", "Fresh", "Lucas", "Margeu", "Zaza", "Cé", "Nazim", "JC", "Digo"];
     function getRandomName(){
         const randomElement = Math.floor(Math.random() * botNames.length);
@@ -146,8 +151,7 @@ const endRound = (game, callingPlayer) => {
     let winners = {
         score: 100,
         names:[]
-    };
-
+    }
     // Stats - moinsdeneuf
     
 
@@ -162,11 +166,9 @@ const endRound = (game, callingPlayer) => {
             winners.names.push(player.name);
         }
         scores[player.name] = score;
-    });
-
+    })
     // Remove player is equality and allowWinEquality
-    if(!game.conf.allowWinEquality && winners.names.includes(callingPlayer) && winners.names.length > 1) winners.names.splice(winners.names.indexOf(callingPlayer),1);
-
+    if(!game.conf.allowWinEquality && winners.names.includes(callingPlayer) && winners.names.length > 1) winners.names.splice(winners.names.indexOf(callingPlayer),1)
     game.players.forEach(player => { 
         // ***** Multiple cards *****
         CardGame.sort(player.hand);
@@ -176,10 +178,8 @@ const endRound = (game, callingPlayer) => {
         let scoreStreak = 0;
         let handScore = scores[player.name] || 0;
         const oldScore = player.score;
-        const oldStreak = player.scoreStreak;
-
-        if(isCaller) player.stats.moinsdeneuf.call++;
-
+        const oldStreak = player.scoreStreak
+        if(isCaller) player.stats.moinsdeneuf.call++
         if(isWinner){
             score = 0;
             if(isCaller && game.conf.allowStreak && (!game.conf.onlyOneWinnerStreak || game.conf.onlyOneWinnerStreak && winners.names.length === 1)){
@@ -211,16 +211,13 @@ const endRound = (game, callingPlayer) => {
             score,
             scoreStreak,
             hand: player.hand
-        };
-
+        }
         player.ready = player.bot || false;
         player.hand = [];
-    });
-
+    })
     game.action = null;
     game.currentPlayer = null;
-    game.playedCards = [];
-
+    game.playedCards = []
     // Sort players
     game.players.sort((first, second) => {
         if(first.score < second.score) return -1;
@@ -230,8 +227,7 @@ const endRound = (game, callingPlayer) => {
             if(first.scoreStreak > second.scoreStreak) return -1;
             return 0;
         }
-    });
-
+    })
     // End game
     // by score
     game.players.forEach(player => {
@@ -260,8 +256,7 @@ const endRound = (game, callingPlayer) => {
     }
 
     if(game.spectators) game.spectators.forEach(spectator => addPlayer(spectator, game));
-    game.spectators = [];
-
+    game.spectators = []
     return {scores, winners, announcer: callingPlayer};
 }
 
@@ -283,10 +278,8 @@ const previousPlayer = (game, index = 1) => {
 }
 
 const quickPlay = (player, cards, game) => {
-    if(!game.conf.allowQuickPlay || cards.length > 1 || (game.turn === 1 && game.players[0].name === game.currentPlayer)) return null;
-
-    const isLastCard = player.hand[player.hand.length - 1].value === cards[0].value &&  player.hand[player.hand.length - 1].color === cards[0].color;
-
+    if(!game.conf.allowQuickPlay || cards.length > 1 || (game.turn === 1 && game.players[0].name === game.currentPlayer)) return null
+    const isLastCard = player.hand[player.hand.length - 1].value === cards[0].value &&  player.hand[player.hand.length - 1].color === cards[0].color
     if(isLastCard && previousPlayer(game).name === player.name && checkPlayedCards([...game.playedCards[game.playedCards.length - 1], ...cards], true)){
        
         if(previousPlayer(game).name === player.name){
@@ -349,11 +342,9 @@ const kickPlayer = (player, game, games) => {
     game.pickStack.concat(player.hand);
     const index = game.players.indexOf(player);
     if(game.currentPlayer === player.name) game.currentPlayer = index + 1 < game.players.length ? game.players[index + 1].name : 0;
-    if(index !== -1) game.players.splice(index, 1);
-
+    if(index !== -1) game.players.splice(index, 1)
     const specIndex = game.spectators.indexOf(player);
-    if(specIndex !== -1) game.spectators.splice(specIndex, 1);
-
+    if(specIndex !== -1) game.spectators.splice(specIndex, 1)
     if(game.players.length === 0 && games) createGame(games, game.conf, true);
 }
 
@@ -398,12 +389,10 @@ const nextAction = (game)=> {
                 }
             }
             console.error("Error: an action should happen!");
-        break;
-
+        break
         case "play":
             game.action = "pick";
-        break;
-
+        break
         default:
             game.action = "play";
     }
@@ -450,8 +439,7 @@ const getPublicGameInfo = (game, gameFinished = false, setTime = false)=> {
             bot: player.bot || false,
             hand: []
         }
-    });
-
+    })
     // Return 2 last hands if player is picking
     let playedCards = [];
     if(game.action === "pick" && game.playedCards.length > 1){
@@ -477,11 +465,9 @@ const getPublicGameInfo = (game, gameFinished = false, setTime = false)=> {
         round: game.round,
         spectators: game.spectators || []
     }
-};
-
+}
 const checkPlayedCards = (originalcards, quickPlay = false) => {
-    const cards = originalcards.map((card) => {return {...card}});
-
+    const cards = originalcards.map((card) => {return {...card}})
     // ***** No cards *****
     if(!cards || !cards.length) return false;
     
@@ -489,23 +475,19 @@ const checkPlayedCards = (originalcards, quickPlay = false) => {
     if(cards.length === 1) return true;
         
     // ***** Multiple cards *****
-    CardGame.sort(cards);
-
+    CardGame.sort(cards)
     // Get jokers
     let jokers = 0;
     while(cards[jokers] && cards[jokers].value === "*") jokers++;
     // Extract jokers
-    cards.splice(0, jokers);
-
-    if(!cards.length || cards.length === 1) return true;
-
+    cards.splice(0, jokers)
+    if(!cards.length || cards.length === 1) return true
     if(cards[0].value === cards[1].value){
         return cards.every(card => card.value === cards[0].value);
     } else if(originalcards.length > 2){
         // Fluch
         let expectedValue;
-        let color;
-
+        let color
         if(quickPlay){
             // Change As value if needed (only one 1 could be there)
             if(CardGame.getValue(cards[0]) === 1 && CardGame.getValue(cards[1]) > 4){
@@ -519,14 +501,11 @@ const checkPlayedCards = (originalcards, quickPlay = false) => {
                 const card1Value = CardGame.getValue(cards[i - 1]);
                 let card2Value = CardGame.getValue(cards[i]);
                 if(i === cards.length - 1 && card2Value === 1) card2Value = 14;
-                const diff = card2Value - card1Value;
-
+                const diff = card2Value - card1Value
                 // Check color
-                if(cards[i - 1].color !== cards[i].color) return false;
-
+                if(cards[i - 1].color !== cards[i].color) return false
                 // Logic order
-                if(diff === 1) continue;
-
+                if(diff === 1) continue
                 // Use joker
                 jokers = jokers - (diff - 1);
                 if(jokers < 0) return false;
@@ -555,8 +534,7 @@ const checkPlayedCards = (originalcards, quickPlay = false) => {
         return true;
     }
     return false;
-};
-
+}
 const valueToMillisecond = (value) => {
     switch(value){
         case "30s":
@@ -597,6 +575,7 @@ const getPublicPlayers = (players, games) => {
     return Object.entries(players).map(([name, player]) =>{
         return {
             name,
+            status: player.id ? "connected" : "disconnected",
             game: getCurrentGameForPlayer(player, games) || null
         }
     });
@@ -623,5 +602,6 @@ module.exports = {
     getCurrentGameForPlayer,
     addPlayer,
     addSpectator,
-    valueToMillisecond
+    valueToMillisecond,
+    getDBPlayers
 }

@@ -73,6 +73,8 @@ export class Players extends Component<PlayersProps, PlayersState> {
                                                 })}>
                     <Heading tag="h1" appearance="simple" color="secondary">Joueurs</Heading>
                     <Table  header={["Pseudo", "Status"]}
+                            staticHeader
+                            defaultOrder={{header: "Status", direction: "down"}}
                             data={this.memoizedPlayers(this.props.players)}
                             onSelected={selected => this.setState({playerSelected: selected ? this.props.players.filter(p => p.getName() === selected[0])[0] : null})}/>
                     <ButtonGroup size="large" appearance="simple" color="secondary">

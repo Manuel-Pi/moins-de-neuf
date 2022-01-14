@@ -1,6 +1,7 @@
 import { Spinner } from 'pizi-react'
 import React, { useEffect, useRef, useState } from 'react'
 import { PlayerModel } from '../../models/PlayerModel'
+import { PlayerStatsModel } from '../../models/PlayerStatsModel'
 
 
 export interface StatChartProps {
@@ -27,23 +28,33 @@ export const StatChart: React.FC<StatChartProps & React.HTMLAttributes<HTMLDivEl
         let rapiditeMin = 0
         let regulariteMin = 0
         let reactiviteMin = 0
+        let styleMin = 0
+        let styleMax = 0
         players.forEach(player => {
-            victoireMax = Math.max(victoireMax, player.getStats().games.won)
-            rapiditeMax = Math.max(rapiditeMax, player.getStats().moinsdeneuf.ratio)
-            regulariteMax = Math.max(regulariteMax, player.getStats().games.ratio)
-            reactiviteMax = Math.max(reactiviteMax, (player.getStats().quickplay.done - player.getStats().quickplay.taken))
-            victoireMin = Math.min(victoireMin, player.getStats().games.won)
-            rapiditeMin = Math.min(rapiditeMin, player.getStats().moinsdeneuf.ratio)
-            regulariteMin = Math.min(regulariteMin, player.getStats().games.ratio)
-            reactiviteMin = Math.min(reactiviteMin, (player.getStats().quickplay.done - player.getStats().quickplay.taken))
+            const stats = new PlayerStatsModel(player.getStats())
+            victoireMax = Math.max(victoireMax, stats.games.won)
+            rapiditeMax = Math.max(rapiditeMax, stats.getRatio("moinsdeneuf"))
+            regulariteMax = Math.max(regulariteMax, stats.getRatio("games"))
+            reactiviteMax = Math.max(reactiviteMax, stats.quickplay.done - stats.quickplay.taken)
+            victoireMin = Math.min(victoireMin, stats.games.won)
+            rapiditeMin = Math.min(rapiditeMin, stats.getRatio("moinsdeneuf"))
+            regulariteMin = Math.min(regulariteMin, stats.getRatio("games"))
+            reactiviteMin = Math.min(reactiviteMin, (stats.quickplay.done - stats.quickplay.taken))
+            const currentStyle = (stats.moinsdeneuf.won + stats.quickplay.done) / ((stats.games.won + stats.games.lost) || 1)
+            styleMin = Math.min(styleMin, currentStyle)
+            styleMax = Math.max(styleMax, currentStyle)
+            console.log("style max " + player.getName() + ": " + styleMax)
         })
 
         reactiviteMin = Math.max(0, reactiviteMin)
-        const victoire = currentPlayer.getStats().games.won * 6 / victoireMax
-        const style = 4
-        const rapidite = currentPlayer.getStats().moinsdeneuf.ratio * 6 / (rapiditeMax - rapiditeMin)
-        const regularite = currentPlayer.getStats().games.ratio * 6 / (regulariteMax - regulariteMin)
-        const reactivite = Math.max(currentPlayer.getStats().quickplay.done - currentPlayer.getStats().quickplay.taken, 0) * 6 / (reactiviteMax - reactiviteMin)
+        const currentPlayerstats = new PlayerStatsModel(currentPlayer.getStats())
+        const victoire = currentPlayerstats.games.won * 6 / victoireMax
+        const style = ((currentPlayerstats.moinsdeneuf.won + currentPlayerstats.quickplay.done) / (currentPlayerstats.games.won + currentPlayerstats.games.lost)) * 6 / (styleMax - styleMin)
+        console.log("style: " + style)
+        console.log("style: " + ((currentPlayerstats.moinsdeneuf.won + currentPlayerstats.quickplay.done) / (currentPlayerstats.games.won + currentPlayerstats.games.lost)) )
+        const rapidite = currentPlayerstats.getRatio("moinsdeneuf") * 6 / (rapiditeMax - rapiditeMin)
+        const regularite = currentPlayerstats.getRatio("games") * 6 / (regulariteMax - regulariteMin)
+        const reactivite = Math.max(currentPlayerstats.quickplay.done - currentPlayerstats.quickplay.taken, 0) * 6 / (reactiviteMax - reactiviteMin)
         return [Math.max(victoire, 0.5), Math.max(style, 0.5), Math.max(rapidite, 0.5), Math.max(regularite, 0.5), Math.max(reactivite, 0.5)]
     }
 

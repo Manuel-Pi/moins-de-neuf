@@ -1,22 +1,14 @@
-const mongoose = require('mongoose');
+const mongoose = require('mongoose')
 
 const PlayerSchema = new mongoose.Schema({
     user: String,
     stats: {
         games: {
-            played: {
-                type: Number,
-                default: 0
-            },
             won: {
                 type: Number,
                 default: 0
             },
             lost: {
-                type: Number,
-                default: 0
-            },
-            ratio: {
                 type: Number,
                 default: 0
             }
@@ -31,10 +23,6 @@ const PlayerSchema = new mongoose.Schema({
                 default: 0
             },
             lost: {
-                type: Number,
-                default: 0
-            },
-            ratio: {
                 type: Number,
                 default: 0
             }
@@ -63,15 +51,12 @@ const PlayerSchema = new mongoose.Schema({
 });
 
 PlayerSchema.methods.updateStats = function(stats){
-    this.stats.games.played += stats.games.played;
     this.stats.games.won += stats.games.won;
     this.stats.games.lost += stats.games.lost;
-    this.stats.games.ratio = getRatio(this.stats.games.won, this.stats.games.played);
 
     this.stats.moinsdeneuf.call += stats.moinsdeneuf.call;
     this.stats.moinsdeneuf.won += stats.moinsdeneuf.won;
     this.stats.moinsdeneuf.lost += stats.moinsdeneuf.lost;
-    this.stats.moinsdeneuf.ratio = getRatio(this.stats.moinsdeneuf.won, this.stats.moinsdeneuf.call);
 
     this.stats.quickplay.done += stats.quickplay.done;
     this.stats.quickplay.taken += stats.quickplay.taken;
@@ -83,8 +68,4 @@ PlayerSchema.methods.updateStats = function(stats){
     if(this.stats.score.max && this.stats.games.played === 1) this.stats.score.min = this.stats.score.max;
 }
 
-const getRatio = (value, max) => {
-    return max ? Math.round(value / max * 100) : 0;
-}
-
-module.exports = mongoose.model('Player', PlayerSchema);
+module.exports = mongoose.model('Player', PlayerSchema)

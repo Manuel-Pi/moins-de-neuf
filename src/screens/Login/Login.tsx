@@ -56,5 +56,9 @@ export const Login = ({ onLogin = e => null, breakpoint}:LoginProps) => {
                         <Button color="main" appearance="border" className="change-password" onClick={() => onLogin(inputValue, null)}>Continuer sans compte</Button>
                     </CreateAccountModal>
                 </div>
+                <Button display={userStatus === "exist"} iconLeft="chevron-left" onClick={() => {
+                    setUserStatus("")
+                    setPasswordValue("")
+                }}>change login</Button>
             </div>
 }

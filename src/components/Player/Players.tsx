@@ -1,4 +1,4 @@
-import React, { useState, useEffect, CSSProperties } from 'react';
+import React from 'react';
 import {PlayerModel} from '../../models/PlayerModel';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Score } from './Score';

@@ -87,7 +87,7 @@ export class Lobby extends Component<LobbyProps, LobbyState> {
                             onSelected={selected => this.setState({gameSelected: selected ? this.props.games.filter(game => game.getName() === selected[0])[0] : null})}
                             defaultOrder={{
                                 direction: 'down',
-                                header: "Partie"
+                                header: "Partie" 
                             }}>
                     </Table>
                     <ButtonGroup size="large" appearance="simple" color="secondary">

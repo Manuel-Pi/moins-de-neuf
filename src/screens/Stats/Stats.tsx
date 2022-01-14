@@ -3,6 +3,7 @@ import { PiziRest } from '../../utils/PiziServer'
 import { PlayerModel } from '../../models/PlayerModel'
 import { AppScreenProps, Heading, Table, Tabs, Tab, Breakpoint, ListInput } from 'pizi-react'
 import { StatChart } from './StatChart'
+import { PlayerStatsModel } from '../../models/PlayerStatsModel'
 
 type StatsState = {
     players: PlayerModel[]
@@ -51,45 +52,49 @@ export class Stats extends Component<StatsProps, StatsState> {
     }
 
     getPlayersStats(){
+        
         switch(this.state.statsSelection){
             case "games":
                 return {
                     header: ["", "Ratio", "Gagnée", "Perdue"],
-                    data: this.state.players.map(player => [
-                        player.getName(),
-                        this.getRatio(player.getStats().games.ratio),
-                        player.getStats().games.won,
-                        player.getStats().games.lost
-                    ]),
+                    data: this.state.players.map(player => {
+                        const stats = new PlayerStatsModel(player.getStats())
+                        return  [
+                                    player.getName(),
+                                    stats.getRatio("games").toFixed(2),
+                                    stats.games.won,
+                                    stats.games.lost
+                                ]
+                    }),
                     order: {direction:"up", header:"Ratio"}
                 }
             case "lessThanNine":
                 return {
                     header: ["", "Ratio", "Gagné", "Perdu"],
-                    data: this.state.players.map(player => [
-                        player.getName(),
-                        this.getRatio(player.getStats().moinsdeneuf.ratio),
-                        player.getStats().moinsdeneuf.won,
-                        player.getStats().moinsdeneuf.lost
-                    ]),
+                    data: this.state.players.map(player => {
+                        const stats = new PlayerStatsModel(player.getStats())
+                        return  [
+                                    player.getName(),
+                                    stats.getRatio("moinsdeneuf").toFixed(2),
+                                    stats.moinsdeneuf.won,
+                                    stats.moinsdeneuf.lost
+                                ]
+                    }),
                     order: {direction:"up", header:"Ratio"}
                 }
         }
     }
 
-    getPlayerStats(){
-        return this.state.currentPlayer ? this.state.currentPlayer.getStats() : {
+    getPlayerStats(): PlayerStatsModel{
+        return this.state.currentPlayer ? new PlayerStatsModel(this.state.currentPlayer.getStats()) : new PlayerStatsModel({
             games: {
                 won: 0,
-                lost: 0,
-                played: 0,
-                ratio: 0
+                lost: 0
             },
             moinsdeneuf: {
                 call: 0,
                 won: 0,
-                lost: 0,
-                ratio: 0
+                lost: 0
             },
             quickplay: {
                 done: 0,
@@ -99,16 +104,12 @@ export class Stats extends Component<StatsProps, StatsState> {
                 min: 0,
                 max: 0
             }
-        }
-    }
-
-    getRatio(ratio: number = 0){
-        return (ratio / 100).toFixed(2)
+        })
     }
 
     render(){
-        const stats: any = this.getPlayersStats()
-        const stat: any = this.getPlayerStats()
+        const stats:any = this.getPlayersStats()
+        const stat:PlayerStatsModel = this.getPlayerStats()
         return  <div className={"screen stats"}>
                     <Heading tag="h1" appearance="simple" color="secondary">Stats </Heading>
                     <Tabs appearance="simple" color="secondary">
@@ -122,8 +123,7 @@ export class Stats extends Component<StatsProps, StatsState> {
                                     defaultOrder={stats.order}
                                     data={stats.data}
                                     staticHeader
-                                    sortIcon={this.props.breakpoint === "xs" ? "small" : "default"}
-                                    selectable/>
+                                    sortIcon={this.props.breakpoint === "xs" ? "small" : "default"}/>
                         </Tab>  
                         <Tab title="Joueur">
                             <div className="user-screen">
@@ -136,11 +136,11 @@ export class Stats extends Component<StatsProps, StatsState> {
                                 <div className="stat-line">
                                     <div className="stat1">
                                         <Heading tag="h4" appearance="simple" color="secondary">Parties</Heading>
-                                        <Table header={["Jouées", "Gagnées", "Perdues", "Ratio"]} data={[[stat.games.played, stat.games.won, stat.games.lost, this.getRatio(stat.games.ratio)]]}/>
+                                        <Table header={["Jouées", "Gagnées", "Perdues", "Ratio"]} data={[[stat.games.won + stat.games.lost, stat.games.won, stat.games.lost, stat.getRatio("games").toFixed(2)]]}/>
                                     </div>
                                     <div className="stat1">
                                         <Heading tag="h4" appearance="simple" color="secondary">Moins de neuf</Heading>
-                                        <Table header={["Annoncés", "Gagnés", "Perdus", "Ratio"]} data={[[stat.moinsdeneuf.call, stat.moinsdeneuf.won, stat.moinsdeneuf.lost, this.getRatio(stat.moinsdeneuf.ratio)]]}/>
+                                        <Table header={["Annoncés", "Gagnés", "Perdus", "Ratio"]} data={[[stat.moinsdeneuf.call, stat.moinsdeneuf.won, stat.moinsdeneuf.lost, stat.getRatio("moinsdeneuf").toFixed(2)]]}/>
                                     </div>
                                     <div className="stat1">
                                         <Heading tag="h4" appearance="simple" color="secondary">Jeu rapide</Heading>
