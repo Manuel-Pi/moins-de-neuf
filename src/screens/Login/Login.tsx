@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { Logo } from '../../components/Logo/Logo'
 import { Breakpoint, Button, ClassNameHelper, Modal, TextInput } from 'pizi-react'
 import { PiziToken, PiziUsers } from '../../utils/PiziServer'
@@ -15,8 +15,10 @@ export const Login = ({ onLogin = e => null, breakpoint}:LoginProps) => {
     const[inputValue, setInputValue] = useState("")
     const[passwordValue, setPasswordValue] = useState("")
     const[passwordError, setPasswordError] = useState("")
+    const passRef = useRef<HTMLInputElement>(null)
 
     const login = (password?: string) => {
+        if(!inputValue) return
         PiziToken.getToken(inputValue, password || "check").then((token:any) => {
             if(token && token.exist){
                 if(password) setPasswordError("Mauvais mot de passe!")
@@ -36,24 +38,31 @@ export const Login = ({ onLogin = e => null, breakpoint}:LoginProps) => {
                                                             })}>
                     <TextInput  label="login" 
                                 appearance="alt" 
+                                autoFocus
                                 onChange={value => setInputValue(value)}
-                                onKeyDown={event => event.key === 'Enter' && login(passwordValue)}/>
+                                onKeyEnter={() => {
+                                    login(passwordValue)
+                                    if(passRef.current) passRef.current.focus()
+                                }}/>
                     <TextInput  label="password" 
                                 type="password"
                                 appearance="alt" 
                                 error={passwordError}
+                                forwardRef={passRef}
                                 onChange={value => {
                                     setPasswordValue(value)
                                     setPasswordError("")
                                 }}
-                                onKeyDown={event => event.key === 'Enter' && login(passwordValue)}/>
+                                onKeyEnter={() => {
+                                    login(passwordValue)
+                                }}/>
                     <Button color="secondary" onClick={e => login(passwordValue)}>ok</Button>
                     <CreateAccountModal open={userStatus === "new"} 
                                         onCreated={token => onLogin(inputValue, token)} 
                                         login={inputValue} 
                                         fullScreen={breakpoint === "xs"}
                                         onClose={action => action === "cancel" ? setUserStatus("") : ""}>
-                        <Button color="main" appearance="border" className="change-password" onClick={() => onLogin(inputValue, null)}>Continuer sans compte</Button>
+                        <Button color="main" appearance="border" className="no-account" onClick={() => onLogin(inputValue, null)}>Continuer sans compte</Button>
                     </CreateAccountModal>
                 </div>
                 <a hidden={userStatus !== "exist"} className="reset-link" href="/server/password-reset">reset password!</a>

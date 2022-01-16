@@ -2,7 +2,7 @@ const CardManager = require('./pizi-moins-de-neuf-gameManager.js');
 const CardGame = require('./pizi-card-game');
 const mongoose = require('mongoose');
 const ioClient = require('socket.io-client');
-const PlayerModel = require('./database/models/player');
+const UserModel = mongoose.model("User");
 
 module.exports = function({socketServer, console, host}){
     // Get io for a specific namespace
@@ -357,13 +357,13 @@ module.exports = function({socketServer, console, host}){
 
     function addPlayer(socket, name){
         if(!name) return
-        PlayerModel.find({user: name}, (err, playerModels) => {
+        UserModel.find({login: name}, (err, userModels) => {
             if(err) console.error(JSON.stringify(err));
             else {
                 PLAYERS[name] = {
                     id: socket ? socket.id : null,
                     name,
-                    isDBUser: playerModels.length > 0
+                    isDBUser: userModels.length > 0
                 }
                 if(socket) socket.player = name
             }
