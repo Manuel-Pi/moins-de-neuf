@@ -40,6 +40,16 @@ export class CardModel {
         return this.intValue;
     }
 
+    public is(card: CardModel){
+        if(!card) return false
+        return this.color === card.getColor() && this.value === card.getValue()
+    }
+
+    public isIn(cards: CardModel[]){
+        if(!cards) return false
+        return cards.some(card => this.is(card))
+    }
+
     public toJson(){
         return {value: this.value, color: this.color};
     }

@@ -15,9 +15,12 @@ export const Login = ({ onLogin = e => null, breakpoint}:LoginProps) => {
     const[inputValue, setInputValue] = useState("")
     const[passwordValue, setPasswordValue] = useState("")
     const[passwordError, setPasswordError] = useState("")
+    const[error, setError] = useState(false)
     const passRef = useRef<HTMLInputElement>(null)
 
     const login = (password?: string) => {
+        if(error) return
+
         if(!inputValue) return
         PiziToken.getToken(inputValue, password || "check").then((token:any) => {
             if(token && token.exist){
@@ -34,20 +37,26 @@ export const Login = ({ onLogin = e => null, breakpoint}:LoginProps) => {
     return  <div className="login">
                 <Logo/>
                 <div className={ClassNameHelper("inputs",   {
-                                                                "user-valid": userStatus === "exist"
+                                                                "user-valid": userStatus === "exist",
+                                                                "animate__animated animate__headShake": passwordError
                                                             })}>
                     <TextInput  label="login" 
-                                appearance="alt" 
+                                appearance="alt"
                                 autoFocus
+                                valdationMessage={InputValidation.login.message}
+                                valdationRegex={InputValidation.login.regex}
                                 onChange={value => setInputValue(value)}
+                                onError={setError}
                                 onKeyEnter={() => {
                                     login(passwordValue)
-                                    if(passRef.current) passRef.current.focus()
+                                    if(passRef.current) setTimeout(() => passRef.current.focus(), 400)
                                 }}/>
                     <TextInput  label="password" 
                                 type="password"
                                 appearance="alt" 
+                                autoFocus
                                 error={passwordError}
+                                onError={setError}
                                 forwardRef={passRef}
                                 onChange={value => {
                                     setPasswordValue(value)

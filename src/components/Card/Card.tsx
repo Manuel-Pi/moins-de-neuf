@@ -1,4 +1,4 @@
-import React, { CSSProperties } from 'react';
+import React, { CSSProperties, useState } from 'react';
 import {CardModel} from '../../models/CardModel';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { ClassNameHelper } from 'pizi-react';
@@ -9,15 +9,22 @@ type CardProps = {
     className?: string
     onClick?: (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => void,
     ref?: any
+    onDrag?: (x: number) => void
+    onDrop?: () => void
+    movingAllowed?: boolean
 }
 
-export const Card = ({ cardModel, onClick, style, className = "", ref = null }: CardProps) => {
+const TIME_TO_DRAG = 300
+
+const isMoving = (date: Date) => date && ((new Date()).getTime() - date.getTime() > TIME_TO_DRAG)
+
+export const Card = ({ cardModel, onClick, style, className = "", ref = null, onDrag = () => null, onDrop = () => null, movingAllowed = false}: CardProps) => {
 
     let value = "";
     let values = [];
     let symbols = [];
 
-    if(!cardModel) return null;
+    if(!cardModel) return null
 
     if(cardModel.isTurned()){
         value = cardModel.getValue();
@@ -59,7 +66,33 @@ export const Card = ({ cardModel, onClick, style, className = "", ref = null }: 
         symbols.push(<FontAwesomeIcon icon="carrot" size="lg" key="carrot"/>);
     }
 
-    return  <div ref={ref} className={cardModel.isTurned() ? "card turn " + className : "card notTurned " + className} onClick={onClick} style={style}>
+
+    const [touching, setTouching] = useState(null)
+    const onTouchStart = () => {
+       if(movingAllowed) setTouching(new Date())
+    }
+
+    const onTouchEnd = () => {
+        if(movingAllowed){
+            if(isMoving(touching)) onDrop()
+            setTouching(null)
+        }
+    }
+
+    const onTouchMove: React.TouchEventHandler<HTMLDivElement> = (event) => {
+        if(movingAllowed && isMoving(touching)) onDrag(event.touches[0].clientX)
+    }
+
+    return  <div    ref={ref} 
+                    className={ClassNameHelper("card", {
+                        turn: cardModel.isTurned(),
+                        notTurned: !cardModel.isTurned(),
+                        moving: isMoving(touching)
+                    }, className)} 
+                    onClick={onClick} style={style}
+                    onTouchStart={onTouchStart}
+                    onTouchEnd={onTouchEnd}
+                    onTouchMove={onTouchMove}>
                 {values}
                 <div className={`symbol value-${value}`}>
                     {symbols}

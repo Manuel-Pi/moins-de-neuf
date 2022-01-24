@@ -361,7 +361,7 @@ export class GameBoard extends Component<GameProps, GameState> {
                     <div className="fold">
                         <Hand   className={"previous-play " + (this.state.action === "pick" ? "is-picking" : "")}
                                 cardModels={this.state.playedCards[0]} 
-                                selectedCardModels={[this.state.pickSelection]} 
+                                selectedCardModels={this.state.pickSelection ? [this.state.pickSelection] : []} 
                                 onSelected={ cardModel => this.selectPickCard(cardModel)}/>
                         <Hand   className="played" 
                                 cardModels={this.state.playedCards[1]}/>
@@ -370,7 +370,8 @@ export class GameBoard extends Component<GameProps, GameState> {
                         <Hand   cardModels={this.state.hand} 
                                 turned={this.state.cardTurned} 
                                 selectedCardModels={this.state.currentSelection} 
-                                onSelected={ cardModel => this.selectCard(cardModel)}/>
+                                onSelected={ cardModel => this.selectCard(cardModel)}
+                                movingAllowed/>
                     </div>
                     {this.state.results && this.displayResults()}
                     {this.state.gameEnd && this.state.displayEnd && this.displayEndGame()}
